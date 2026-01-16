@@ -7,26 +7,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Playlist {
+public class Follow {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    private String titulo;
+    private LocalDate fecha;
 
-    private int numeroCanciones;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Usuario usuarioSeguidor;
 
-    @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
-    private Usuario usuario;
-
-    @OneToMany(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER,orphanRemoval = true)
-    private List<EntradaPlaylist> cancionesEntradas;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Artista artistaSeguido;
 }
