@@ -22,4 +22,6 @@ public class Colaboracion{
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Cancion cancion;
+
+    private String rol;
 }
