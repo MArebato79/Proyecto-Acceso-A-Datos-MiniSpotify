@@ -22,7 +22,11 @@ public class Playlist {
 
     private String titulo;
 
+    private String foto;
+
     private int numeroCanciones;
+
+    private boolean publica;
 
     @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
     private Usuario usuario;

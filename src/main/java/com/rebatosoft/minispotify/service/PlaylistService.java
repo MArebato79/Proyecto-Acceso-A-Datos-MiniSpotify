@@ -1,12 +1,28 @@
 package com.rebatosoft.minispotify.service;
 
+import com.rebatosoft.minispotify.dto.EntradaPlaylistDto;
+import com.rebatosoft.minispotify.dto.PlaylistDto;
+import com.rebatosoft.minispotify.dto.basicsDto.ArtistaBasicDto;
+import com.rebatosoft.minispotify.dto.basicsDto.CancionBasicDto;
+import com.rebatosoft.minispotify.dto.requests.PlaylistRequest;
+import com.rebatosoft.minispotify.entities.Usuario;
+import com.rebatosoft.minispotify.entities.componentes.Cancion;
+import com.rebatosoft.minispotify.entities.componentes.EntradaPlaylist;
+import com.rebatosoft.minispotify.entities.componentes.Playlist;
 import com.rebatosoft.minispotify.repositories.AlbumRepository;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.PlaylistRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.EntradaPlaylistRepository;
+import com.rebatosoft.minispotify.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,4 +32,86 @@ public class PlaylistService {
     private final CancionRepository cancionRepository;
     private final EntradaPlaylistRepository entradaPlaylistRepository;
     private final PlaylistRepository playlistRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    public PlaylistDto crearPlaylist(PlaylistRequest playlist) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        Playlist list = new Playlist();
+        list.setTitulo(playlist.nombre());
+        list.setPublica(playlist.publica());
+        list.setUsuario(usuario);
+        list.setFoto(null);
+
+        return convertirADto(playlistRepository.save(list));
+
+    }
+
+    public void añadirCancionPlaylist(Long idCancion , Long idPlaylist){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(idPlaylist)))
+                .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+
+        if (!playlist.getUsuario().getCorreo().equals(email)) {
+            throw new RuntimeException("No tienes permiso para editar esta playlist");
+        }
+
+        Cancion cancion = cancionRepository.findById(idCancion)
+                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
+
+        EntradaPlaylist entrada = new EntradaPlaylist();
+        entrada.setPlaylist(playlist);
+        entrada.setCancion(cancion);
+        entrada.setFechaIntroduccion(LocalDate.now());
+
+
+        int nuevaPosicion = playlist.getCancionesEntradas().size() + 1;
+        entrada.setPosicionCancion(nuevaPosicion);
+
+        entradaPlaylistRepository.save(entrada);
+    }
+
+    private List<PlaylistDto> getMyPlaylist(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        return playlistRepository.findByUsuario(usuario).stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
+    private PlaylistDto convertirADto(Playlist playlist) {
+        PlaylistDto dto = new PlaylistDto();
+        dto.setId(playlist.getId().toString());
+        dto.setNombre(playlist.getTitulo());
+        dto.setImagenUrl(playlist.getFoto());
+        dto.setPublica(playlist.isPublica());
+
+        if (playlist.getCancionesEntradas() != null) {
+            List<EntradaPlaylistDto> entradas = playlist.getCancionesEntradas().stream()
+                    .map(entrada -> {
+                        EntradaPlaylistDto entDto = new EntradaPlaylistDto();
+                        entDto.setPosicion(entrada.getPosicionCancion());
+                        entDto.setFechaAgregado(entrada.getFechaIntroduccion().toString());
+
+                        if (entrada.getCancion() != null) {
+                            CancionBasicDto cBasic = new CancionBasicDto();
+                            cBasic.setId(String.valueOf(entrada.getCancion().getId()));
+                            cBasic.setNombre(entrada.getCancion().getTitulo());
+                            entDto.setCancion(cBasic);
+
+                            if (entrada.getCancion().getAutor() != null) {
+                                ArtistaBasicDto aBasic = new ArtistaBasicDto();
+                                aBasic.setId(entrada.getCancion().getAutor().getId().toString());
+                                aBasic.setNombre(entrada.getCancion().getAutor().getNombre());
+                                entDto.setArtista(aBasic);
+                            }
+                        }
+                        return entDto;
+                    }).collect(Collectors.toList());
+            dto.setCancionesEntradas(entradas);
+        }
+        return dto;
+    }
 }

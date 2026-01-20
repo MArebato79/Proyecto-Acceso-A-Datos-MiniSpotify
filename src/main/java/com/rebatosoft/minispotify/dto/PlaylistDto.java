@@ -14,6 +14,7 @@ import java.util.List;
 public class PlaylistDto {
     private String id;
     private String nombre;
+    private boolean publica;
     private String imagenUrl;
     private List<EntradaPlaylistDto> cancionesEntradas;
 }
