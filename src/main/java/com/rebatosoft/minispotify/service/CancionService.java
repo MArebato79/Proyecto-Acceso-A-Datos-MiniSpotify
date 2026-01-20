@@ -4,7 +4,9 @@ import com.rebatosoft.minispotify.entities.componentes.Cancion;
 import com.rebatosoft.minispotify.entities.componentes.Colaboracion;
 import com.rebatosoft.minispotify.repositories.AlbumRepository;
 import com.rebatosoft.minispotify.repositories.ArtistaRepository;
+import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.ColaboracionRepository;
+import com.rebatosoft.minispotify.repositories.TablasIntermedias.EntradaPlaylistRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.HistorialRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class CancionService {
     private final AlbumRepository albumRepository;
     private final ArtistaRepository artistaRepository;
     private final ColaboracionRepository colaboracionRepository;
+    private final CancionRepository cancionRepository;
 
 
 }
