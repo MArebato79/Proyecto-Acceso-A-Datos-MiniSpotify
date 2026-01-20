@@ -11,8 +11,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class PlaylistDto {
     private String id;
     private String nombre;

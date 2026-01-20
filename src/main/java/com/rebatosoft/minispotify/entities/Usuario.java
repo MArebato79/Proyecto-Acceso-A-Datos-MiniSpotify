@@ -1,5 +1,6 @@
 package com.rebatosoft.minispotify.entities;
 
+import com.rebatosoft.minispotify.entities.componentes.Artista;
 import com.rebatosoft.minispotify.entities.componentes.Follow;
 import com.rebatosoft.minispotify.entities.componentes.Historial;
 import com.rebatosoft.minispotify.entities.componentes.Playlist;
@@ -33,4 +34,7 @@ public class Usuario {
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "usuarioSeguidor",fetch = FetchType.LAZY)
     private List<Follow> follows;
+
+    @OneToOne(mappedBy = "usuarioPropietario", cascade = CascadeType.ALL)
+    private Artista datosArtista;
 }

@@ -1,5 +1,6 @@
 package com.rebatosoft.minispotify.entities.componentes;
 
+import com.rebatosoft.minispotify.entities.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,4 +35,8 @@ public class Artista {
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "artistaSeguido",fetch = FetchType.LAZY)
     private List<Follow> follows;
+
+    @OneToOne
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Usuario usuarioPropietario;
 }
