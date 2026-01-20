@@ -16,6 +16,8 @@ import java.util.List;
 public class ArtistaDto {
     private String id;
     private String nombre;
+    private String biografia;
+    private String imagenUrl;
     private List<PlaylistBasicDto> playlists;
     private List<AlbumBasicDto> albums;
 }

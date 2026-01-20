@@ -22,6 +22,10 @@ public class Artista {
 
     private String nombre;
 
+    private String biografia;
+
+    private String foto;
+
     private int numeroCanciones;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "artista")

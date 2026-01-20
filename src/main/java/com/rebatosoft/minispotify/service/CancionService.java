@@ -1,11 +1,10 @@
 package com.rebatosoft.minispotify.service;
 
+import com.rebatosoft.minispotify.dto.ArtistaDto;
 import com.rebatosoft.minispotify.dto.CancionDto;
+import com.rebatosoft.minispotify.dto.basicsDto.AlbumBasicDto;
 import com.rebatosoft.minispotify.dto.requests.CancionRequest;
-import com.rebatosoft.minispotify.entities.componentes.Album;
-import com.rebatosoft.minispotify.entities.componentes.Artista;
-import com.rebatosoft.minispotify.entities.componentes.Cancion;
-import com.rebatosoft.minispotify.entities.componentes.Colaboracion;
+import com.rebatosoft.minispotify.entities.componentes.*;
 import com.rebatosoft.minispotify.repositories.AlbumRepository;
 import com.rebatosoft.minispotify.repositories.ArtistaRepository;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
@@ -31,9 +30,9 @@ public class CancionService {
     private final ColaboracionRepository colaboracionRepository;
     private final CancionRepository cancionRepository;
 
-// --- CONVERTERS ---
 
-    // De Entidad a Response DTO
+
+
     private CancionDto convertirADto(Cancion cancion) {
         CancionDto dto = new CancionDto();
         dto.setId((long) cancion.getId());
@@ -60,7 +59,7 @@ public class CancionService {
     private Cancion convertirAEntidad(CancionRequest request, Artista autor, Album album) {
         Cancion c = new Cancion();
         c.setTitulo(request.titulo());
-        c.setGenero(request.genero());
+        c.setGenero(GENEROS.valueOf(request.genero()));
         c.setAutor(autor);
         c.setAlbum(album);
         return c;

@@ -22,6 +22,8 @@ public class Album {
 
     private String nombre;
 
+    private String foto;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Artista artista;
 

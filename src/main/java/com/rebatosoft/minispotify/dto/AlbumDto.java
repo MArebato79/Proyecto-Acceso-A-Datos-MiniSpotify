@@ -16,6 +16,7 @@ import java.util.List;
 public class AlbumDto {
     private String id;
     private String nombre;
+    private String imagenUrl;
     private ArtistaBasicDto artista;
     private List<CancionBasicDto> canciones;
 }
