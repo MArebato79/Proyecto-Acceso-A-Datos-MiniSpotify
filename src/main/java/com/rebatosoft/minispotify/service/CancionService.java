@@ -35,6 +35,57 @@ public class CancionService {
     private final CancionRepository cancionRepository;
     private final UsuarioRepository usuarioRepository;
 
+    public CancionDto crearCancion(CancionRequest request) { // Hazlo public
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (usuario.getDatosArtista() == null) {
+            throw new RuntimeException("No eres artista para crear canciones");
+        }
+
+        Cancion cancion = new Cancion();
+        cancion.setTitulo(request.titulo());
+        cancion.setPublica(request.publica());
+
+        try {
+            cancion.setGenero(GENEROS.valueOf(request.genero().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Género no válido");
+        }
+        cancion.setAutor(usuario.getDatosArtista());
+
+        if (request.albumId() != null) {
+            Album album = albumRepository.findById(Integer.valueOf(request.albumId()))
+                    .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
+
+            if (!album.getArtista().getId().equals(usuario.getDatosArtista().getId())) {
+                throw new RuntimeException("No puedes añadir canciones a un álbum que no es tuyo");
+            }
+            cancion.setAlbum(album);
+        }
+
+        cancion = cancionRepository.save(cancion);
+
+        if (request.colaboradores() != null && !request.colaboradores().isEmpty()) {
+
+            List<Colaboracion> listaProcesada = request.colaboradores();
+
+            for (Colaboracion colab : listaProcesada) {
+                colab.setCancion(cancion);
+
+                if (colab.getArtistaColaborador() != null) {
+                    Long idArtista = colab.getArtistaColaborador().getId();
+                    Artista artistaReal = artistaRepository.findById(idArtista);
+                    colab.setArtistaColaborador(artistaReal);
+                }
+            }
+
+            colaboracionRepository.saveAll(listaProcesada);
+            cancion.setColaboraciones(listaProcesada);
+        }
+        return convertirADto(cancion);
+    }
 
     private CancionDto cambiarEstado(boolean estado, Cancion cancion) {
 
@@ -54,6 +105,108 @@ public class CancionService {
 
         return convertirADto(cancionRepository.save(cancion));
 
+    }
+
+    public CancionDto updateCancion(Long id, CancionRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        Cancion cancion = cancionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
+
+        if (usuario.getDatosArtista() == null ||
+                !cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
+            throw new RuntimeException("No tienes permiso para editar esta canción");
+        }
+
+        cancion.setTitulo(request.titulo());
+        cancion.setGenero(GENEROS.valueOf(String.valueOf(request)));
+
+
+        if (request.albumId() != null) {
+
+            Album nuevoAlbum = albumRepository.findById(Integer.valueOf(request.albumId()))
+                    .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
+
+            if (!nuevoAlbum.getArtista().getId().equals(usuario.getDatosArtista().getId())) {
+                throw new RuntimeException("No puedes mover la canción a un álbum que no es tuyo");
+            }
+            cancion.setAlbum(nuevoAlbum);
+        } else {
+            cancion.setAlbum(null);
+        }
+
+        return convertirADto(cancionRepository.save(cancion));
+    }
+
+
+
+
+    private CancionDto convertirADto(Cancion cancion) {
+        CancionDto dto = new CancionDto();
+        dto.setId((long) cancion.getId());
+        dto.setTitulo(cancion.getTitulo());
+        dto.setGenero(cancion.getGenero() != null ? cancion.getGenero().toString() : null);
+
+        if (cancion.getAutor() != null) {
+            ArtistaDto artDto = new ArtistaDto();
+            artDto.setId(cancion.getAutor().getId().toString());
+            artDto.setNombre(cancion.getAutor().getNombre());
+            dto.setArtista(artDto);
+        }
+
+        if (cancion.getAlbum() != null) {
+            AlbumBasicDto albumBasic = new AlbumBasicDto();
+            albumBasic.setId(cancion.getAlbum().getId().toString());
+            albumBasic.setNombre(cancion.getAlbum().getNombre());
+            dto.setAlbum(albumBasic);
+        }
+        return dto;
+    }
+
+    private Cancion convertirAEntidad(CancionRequest request, Artista autor, Album album) {
+        Cancion c = new Cancion();
+        c.setTitulo(request.titulo());
+        c.setGenero(GENEROS.valueOf(request.genero()));
+        c.setAutor(autor);
+        c.setAlbum(album);
+        return c;
+    }
+
+    public void deleteCancion(Long id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        Cancion cancion = cancionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
+
+
+        if (usuario.getDatosArtista() == null ||
+                !cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
+            throw new RuntimeException("No tienes permiso para borrar esta canción");
+        }
+        // si tienes configurado CascadeType.ALL o orphanRemoval=true en la entidad.
+
+        cancionRepository.delete(cancion);
+    }
+
+    //Gestion de colaboradores
+
+    public void eliminarColaborador(Long cancionId, Long artistaColaboradorId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        Cancion cancion = cancionRepository.findById(cancionId).orElseThrow();
+
+
+        if (!cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
+            throw new RuntimeException("No autorizado");
+        }
+
+        cancion.getColaboraciones().removeIf(c ->
+                c.getArtistaColaborador().getId().equals(artistaColaboradorId.intValue())
+        );
+        cancionRepository.save(cancion);
     }
 
     private CancionDto añadirColaboradores(List<Integer> colaboradoresIds,Integer cancionId) {
@@ -97,34 +250,25 @@ public class CancionService {
     }
 
 
-    private CancionDto convertirADto(Cancion cancion) {
-        CancionDto dto = new CancionDto();
-        dto.setId((long) cancion.getId());
-        dto.setTitulo(cancion.getTitulo());
-        dto.setGenero(cancion.getGenero() != null ? cancion.getGenero().toString() : null);
 
-        if (cancion.getAutor() != null) {
-            ArtistaDto artDto = new ArtistaDto();
-            artDto.setId(cancion.getAutor().getId().toString());
-            artDto.setNombre(cancion.getAutor().getNombre());
-            dto.setArtista(artDto);
-        }
+    // metodos de busqueda
 
-        if (cancion.getAlbum() != null) {
-            AlbumBasicDto albumBasic = new AlbumBasicDto();
-            albumBasic.setId(cancion.getAlbum().getId().toString());
-            albumBasic.setNombre(cancion.getAlbum().getNombre());
-            dto.setAlbum(albumBasic);
-        }
-        return dto;
+    public List<CancionDto> searchCanciones(String termino) {
+        return cancionRepository.findByTituloContainingIgnoreCase(termino).stream()
+                .filter(Cancion::isPublica)
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
 
-    private Cancion convertirAEntidad(CancionRequest request, Artista autor, Album album) {
-        Cancion c = new Cancion();
-        c.setTitulo(request.titulo());
-        c.setGenero(GENEROS.valueOf(request.genero()));
-        c.setAutor(autor);
-        c.setAlbum(album);
-        return c;
+    public CancionDto getCancionById(Long id) {
+        Cancion cancion = cancionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
+
+        if (!cancion.isPublica()) {
+            // Si es privada, solo el dueño debería poder verla.
+            // Aquí podrías meter lógica de seguridad extra.
+        }
+
+        return convertirADto(cancion);
     }
 }
