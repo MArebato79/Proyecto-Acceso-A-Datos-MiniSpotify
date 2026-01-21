@@ -1,10 +1,12 @@
 package com.rebatosoft.minispotify.service;
 
 import com.rebatosoft.minispotify.dto.ArtistaDto;
+import com.rebatosoft.minispotify.dto.CancionDto;
 import com.rebatosoft.minispotify.dto.basicsDto.AlbumBasicDto;
 import com.rebatosoft.minispotify.dto.requests.ArtistaRequest;
 import com.rebatosoft.minispotify.entities.Usuario;
 import com.rebatosoft.minispotify.entities.componentes.Artista;
+import com.rebatosoft.minispotify.entities.componentes.Cancion;
 import com.rebatosoft.minispotify.repositories.ArtistaRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +67,12 @@ public class ArtistaService {
 
     public List<ArtistaDto> getAllArtistas() {
         return artistaRepository.findAll().stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArtistaDto> searchArtista(String termino) {
+        return artistaRepository.findByNombreContainingIgnoreCase(termino).stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }

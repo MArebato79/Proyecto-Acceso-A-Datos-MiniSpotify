@@ -185,8 +185,6 @@ public class CancionService {
                 !cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
             throw new RuntimeException("No tienes permiso para borrar esta canción");
         }
-        // si tienes configurado CascadeType.ALL o orphanRemoval=true en la entidad.
-
         cancionRepository.delete(cancion);
     }
 

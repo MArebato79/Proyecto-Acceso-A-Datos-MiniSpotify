@@ -49,11 +49,11 @@ public class AlbumService {
         return convertirADto(repository.save(album));
     }
 
-    public void añadirCancionAlbum(Long idCancion , Long idPlaylist){
+    public void añadirCancionAlbum(Long idCancion , Long idAlbum){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
 
-        Album album = repository.findById(Integer.parseInt(String.valueOf(idPlaylist)))
+        Album album = repository.findById(Integer.parseInt(String.valueOf(idAlbum)))
                 .orElseThrow(() -> new RuntimeException("album no encontrado"));
 
         if (usuario.getDatosArtista() == null) {
@@ -70,6 +70,33 @@ public class AlbumService {
        cancion.setAlbum(album);
 
        cancionRepository.save(cancion);
+    }
+
+    public void eliminarCancionAlbum(Long idCancion , Long idAlbum){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        if (usuario.getDatosArtista() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres artista");
+        }
+
+        Album album = repository.findById(Integer.parseInt(String.valueOf(idAlbum)))
+                .orElseThrow(() -> new RuntimeException("album no encontrado"));
+
+        if (!album.getArtista().getId().equals(usuario.getDatosArtista().getId())) {
+            throw new RuntimeException("No tienes permiso para editar este Album");
+        }
+
+        Cancion cancion = cancionRepository.findById(idCancion)
+                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
+
+        if (cancion.getAlbum() == null || !cancion.getAlbum().getId().equals(album.getId())) {
+            throw new RuntimeException("Esta canción no pertenece al álbum indicado");
+        }
+
+        cancion.setAlbum(null);
+
+        cancionRepository.save(cancion);
     }
 
     private AlbumDto convertirADto(Album album) {

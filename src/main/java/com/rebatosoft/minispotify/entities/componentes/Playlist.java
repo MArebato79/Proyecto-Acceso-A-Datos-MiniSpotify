@@ -22,6 +22,8 @@ public class Playlist {
 
     private String titulo;
 
+    private String descripcion;
+
     private String foto;
 
     private int numeroCanciones;

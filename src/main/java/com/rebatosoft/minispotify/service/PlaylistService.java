@@ -48,6 +48,35 @@ public class PlaylistService {
 
     }
 
+    private PlaylistDto updatePlaylist(PlaylistRequest playlistRequest,Long id){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+        Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(id)))
+                .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+
+        playlist.setTitulo(playlistRequest.nombre());
+        playlist.setDescripcion(playlistRequest.descripcion());
+        playlist.setPublica(playlistRequest.publica());
+        playlist.setFoto(playlistRequest.imagenUrl());
+
+        return convertirADto(playlistRepository.save(playlist));
+
+    }
+
+    public void deletePlaylist(Long idPlaylist) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        Playlist playlist = playlistRepository.findById(idPlaylist.intValue())
+                .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+
+        if (!playlist.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("No tienes permiso para eliminar esta playlist");
+        }
+
+        playlistRepository.delete(playlist);
+    }
+
     public void añadirCancionPlaylist(Long idCancion , Long idPlaylist){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(idPlaylist)))
@@ -80,6 +109,33 @@ public class PlaylistService {
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
+    public void eliminarCancionPlaylist(Long idCancion , Long idPlaylist){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+        Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(idPlaylist)))
+                .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+
+        if (!playlist.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("No tienes permiso para eliminar canciones");
+        }
+
+        Cancion cancion = cancionRepository.findById(idCancion)
+                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
+
+        if(cancion == null){
+            throw new RuntimeException("Cancion no encontrada");
+        }
+
+        EntradaPlaylist entrada = entradaPlaylistRepository.findByCancionAndPlaylist(cancion,playlist);
+
+        if(entrada == null){
+            throw new RuntimeException("entrada no encontrada");
+        }
+
+        playlist.getCancionesEntradas().remove(entrada);
+        playlistRepository.save(playlist);
+    }
+
 
     private PlaylistDto convertirADto(Playlist playlist) {
         PlaylistDto dto = new PlaylistDto();
