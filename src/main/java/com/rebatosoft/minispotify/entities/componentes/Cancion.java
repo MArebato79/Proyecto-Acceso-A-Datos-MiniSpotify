@@ -24,6 +24,8 @@ public class Cancion {
 
     private GENEROS genero;
 
+    private boolean publica;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Artista autor;
 
