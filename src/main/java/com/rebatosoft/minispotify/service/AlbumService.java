@@ -10,6 +10,7 @@ import com.rebatosoft.minispotify.repositories.AlbumRepository;
 import com.rebatosoft.minispotify.repositories.ArtistaRepository;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +32,7 @@ public class AlbumService {
     private final ArtistaRepository artistaRepository;
     private final UsuarioRepository usuarioRepository;
 
+    @Transactional
     public AlbumDto crearAlbum(AlbumRequest albumRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -49,6 +51,7 @@ public class AlbumService {
         return convertirADto(repository.save(album));
     }
 
+    @Transactional
     public void añadirCancionAlbum(Long idCancion , Long idAlbum){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -72,6 +75,7 @@ public class AlbumService {
        cancionRepository.save(cancion);
     }
 
+    @Transactional
     public void eliminarCancionAlbum(Long idCancion , Long idAlbum){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();

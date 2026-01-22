@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -35,6 +36,7 @@ public class CancionService {
     private final CancionRepository cancionRepository;
     private final UsuarioRepository usuarioRepository;
 
+    @Transactional
     public CancionDto crearCancion(CancionRequest request) { // Hazlo public
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email)
@@ -87,7 +89,8 @@ public class CancionService {
         return convertirADto(cancion);
     }
 
-    private CancionDto cambiarEstado(boolean estado, Cancion cancion) {
+    @Transactional
+    public CancionDto cambiarEstado(boolean estado, Long id) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email)
@@ -96,6 +99,7 @@ public class CancionService {
         if(usuario.getDatosArtista()==null) {
             throw new RuntimeException("usuario no permitido");
         }
+        Cancion cancion = cancionRepository.findById(id).orElseThrow(() -> new RuntimeException("cancion no encontrada"));
 
         if (!cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
             throw new RuntimeException("No tienes permiso para modificar esta canción");
@@ -107,6 +111,7 @@ public class CancionService {
 
     }
 
+    @Transactional
     public CancionDto updateCancion(Long id, CancionRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -173,6 +178,7 @@ public class CancionService {
         return c;
     }
 
+    @Transactional
     public void deleteCancion(Long id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -190,6 +196,7 @@ public class CancionService {
 
     //Gestion de colaboradores
 
+    @Transactional
     public void eliminarColaborador(Long cancionId, Long artistaColaboradorId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -207,7 +214,8 @@ public class CancionService {
         cancionRepository.save(cancion);
     }
 
-    private CancionDto añadirColaboradores(List<Integer> colaboradoresIds,Integer cancionId) {
+    @Transactional
+    public CancionDto añadirColaboradores(List<Integer> colaboradoresIds,Integer cancionId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email)
                 .orElseThrow(() -> new RuntimeException("usuario no encontrado"));

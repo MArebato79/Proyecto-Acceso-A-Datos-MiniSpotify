@@ -9,6 +9,7 @@ import com.rebatosoft.minispotify.entities.componentes.Artista;
 import com.rebatosoft.minispotify.entities.componentes.Cancion;
 import com.rebatosoft.minispotify.repositories.ArtistaRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ArtistaService {
     private final ArtistaRepository artistaRepository;
     private final UsuarioRepository usuarioRepository;
 
+    @Transactional
     public ArtistaDto createPerfilArtista(ArtistaRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -46,6 +48,7 @@ public class ArtistaService {
         return convertirADto(artista);
     }
 
+    @Transactional
     public ArtistaDto updateArtista(ArtistaRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

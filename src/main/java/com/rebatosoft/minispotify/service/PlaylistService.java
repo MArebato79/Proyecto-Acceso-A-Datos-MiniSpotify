@@ -14,6 +14,7 @@ import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.PlaylistRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.EntradaPlaylistRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final UsuarioRepository usuarioRepository;
 
+    @Transactional
     public PlaylistDto crearPlaylist(PlaylistRequest playlist) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -48,7 +50,8 @@ public class PlaylistService {
 
     }
 
-    private PlaylistDto updatePlaylist(PlaylistRequest playlistRequest,Long id){
+    @Transactional
+    public PlaylistDto updatePlaylist(PlaylistRequest playlistRequest,Long id){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
         Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(id)))
@@ -63,6 +66,7 @@ public class PlaylistService {
 
     }
 
+    @Transactional
     public void deletePlaylist(Long idPlaylist) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
@@ -77,6 +81,7 @@ public class PlaylistService {
         playlistRepository.delete(playlist);
     }
 
+    @Transactional
     public void añadirCancionPlaylist(Long idCancion , Long idPlaylist){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(idPlaylist)))
@@ -109,6 +114,8 @@ public class PlaylistService {
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
     public void eliminarCancionPlaylist(Long idCancion , Long idPlaylist){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();

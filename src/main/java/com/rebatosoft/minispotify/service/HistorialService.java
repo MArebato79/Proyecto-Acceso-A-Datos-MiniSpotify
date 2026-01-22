@@ -7,6 +7,7 @@ import com.rebatosoft.minispotify.entities.componentes.Historial;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.HistorialRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class HistorialService {
     private final UsuarioRepository usuarioRepository;
     private final CancionRepository cancionRepository;
 
+    @Transactional
     public void registrarEscucha(Long cancionId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
