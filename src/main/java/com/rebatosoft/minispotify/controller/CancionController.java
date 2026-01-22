@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.*;
 import java.util.List;
 
-@RestController("/cancion")
+@RestController("/canciones")
 @RequiredArgsConstructor
 public class CancionController {
 
