@@ -2,6 +2,7 @@ package com.rebatosoft.minispotify.service;
 
 import com.rebatosoft.minispotify.dto.ArtistaDto;
 import com.rebatosoft.minispotify.dto.CancionDto;
+import com.rebatosoft.minispotify.dto.ColaboracionDto;
 import com.rebatosoft.minispotify.dto.basicsDto.AlbumBasicDto;
 import com.rebatosoft.minispotify.dto.requests.CancionRequest;
 import com.rebatosoft.minispotify.entities.Usuario;
@@ -10,17 +11,12 @@ import com.rebatosoft.minispotify.repositories.AlbumRepository;
 import com.rebatosoft.minispotify.repositories.ArtistaRepository;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.ColaboracionRepository;
-import com.rebatosoft.minispotify.repositories.TablasIntermedias.EntradaPlaylistRepository;
-import com.rebatosoft.minispotify.repositories.TablasIntermedias.HistorialRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -169,6 +165,21 @@ public class CancionService {
         return dto;
     }
 
+    private ColaboracionDto convertirAColaboracionDto(Colaboracion colab) {
+
+        ColaboracionDto dto = new ColaboracionDto();
+
+        if (colab.getArtistaColaborador() != null) {
+            dto.setArtistaId(String.valueOf(colab.getArtistaColaborador().getId()));
+            dto.setNombre(colab.getArtistaColaborador().getNombre());
+            dto.setImagenUrl(colab.getArtistaColaborador().getFoto());
+            dto.setRol(colab.getRol());
+        }
+
+        dto.setRol(colab.getRol()); // "Feat", etc.
+        return dto;
+    }
+
     private Cancion convertirAEntidad(CancionRequest request, Artista autor, Album album) {
         Cancion c = new Cancion();
         c.setTitulo(request.titulo());
@@ -197,35 +208,17 @@ public class CancionService {
     //Gestion de colaboradores
 
     @Transactional
-    public void eliminarColaborador(Long cancionId, Long artistaColaboradorId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
-
-        Cancion cancion = cancionRepository.findById(cancionId).orElseThrow();
-
-
-        if (!cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
-            throw new RuntimeException("No autorizado");
-        }
-
-        cancion.getColaboraciones().removeIf(c ->
-                c.getArtistaColaborador().getId().equals(artistaColaboradorId.intValue())
-        );
-        cancionRepository.save(cancion);
-    }
-
-    @Transactional
-    public CancionDto añadirColaboradores(List<Integer> colaboradoresIds,Integer cancionId) {
+    public List<ColaboracionDto> agregarColaboradores(List<Integer> colaboradoresIds, Integer cancionId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email)
-                .orElseThrow(() -> new RuntimeException("usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (usuario.getDatosArtista() == null) {
             throw new RuntimeException("No eres artista");
         }
 
         Cancion cancion = cancionRepository.findById(Long.valueOf(cancionId))
-                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
         if (!cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
             throw new RuntimeException("No puedes añadir colaboradores a una canción que no es tuya");
@@ -251,8 +244,35 @@ public class CancionService {
         } else {
             cancion.getColaboraciones().addAll(nuevasColaboraciones);
         }
+        return cancion.getColaboraciones().stream()
+                .map(this::convertirAColaboracionDto)
+                .collect(Collectors.toList());
+    }
 
-        return convertirADto(cancion);
+    @Transactional
+    public List<ColaboracionDto> eliminarColaborador(Long cancionId, Long artistaColaboradorId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+        Cancion cancion = cancionRepository.findById(cancionId).orElseThrow();
+
+        if (!cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
+            throw new RuntimeException("No autorizado");
+        }
+
+        boolean borrado = cancion.getColaboraciones().removeIf(c ->
+                c.getArtistaColaborador().getId().equals(artistaColaboradorId.intValue())
+        );
+
+        if (!borrado) {
+            throw new RuntimeException("El colaborador no estaba en la canción");
+        }
+
+        cancionRepository.save(cancion);
+
+        return cancion.getColaboraciones().stream()
+                .map(this::convertirAColaboracionDto)
+                .collect(Collectors.toList());
     }
 
 

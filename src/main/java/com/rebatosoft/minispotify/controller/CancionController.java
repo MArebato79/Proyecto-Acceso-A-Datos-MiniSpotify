@@ -1,8 +1,9 @@
 package com.rebatosoft.minispotify.controller;
 
 import com.rebatosoft.minispotify.dto.CancionDto;
+import com.rebatosoft.minispotify.dto.ColaboracionDto;
 import com.rebatosoft.minispotify.dto.requests.CancionRequest;
-import com.rebatosoft.minispotify.entities.componentes.Cancion;
+import com.rebatosoft.minispotify.dto.requests.ColaboracionRequest;
 import com.rebatosoft.minispotify.service.CancionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.*;
+import java.util.List;
+
 @RestController("/cancion")
 @RequiredArgsConstructor
 public class CancionController {
 
     private final CancionService cancionService;
+
+    // Metodos de Cancion
 
     @PostMapping()
     public ResponseEntity<CancionDto> crearCancion(@RequestBody @Valid CancionRequest cancion) {
@@ -28,5 +34,40 @@ public class CancionController {
         CancionDto cancionEditada = cancionService.cambiarEstado(estado,id);
         return ResponseEntity.ok(cancionEditada);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CancionDto> actualizarCancion(@PathVariable Long id, @RequestBody @Valid CancionRequest cancion) {
+        CancionDto cancionEditada = cancionService.updateCancion(id,cancion);
+        return ResponseEntity.ok(cancionEditada);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarCancion(@PathVariable Long id) {
+        cancionService.deleteCancion(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CancionDto>> obtenerCancionesBuscador(@RequestParam String filtro) {
+        List<CancionDto> cancionesBuscadas = cancionService.searchCanciones(filtro);
+        return ResponseEntity.ok(cancionesBuscadas);
+    }
+
+    // Metodos de Colaboraciones
+    @PostMapping("/{id}/colaboradores")
+     public ResponseEntity<List<ColaboracionDto>> añadirColaborador(@PathVariable("id") Long id, @RequestParam List<Integer> colaboracion) {
+        List<ColaboracionDto> colaboracionDto = cancionService.agregarColaboradores(colaboracion,id.intValue());
+        return ResponseEntity.ok(colaboracionDto);
+    }
+
+
+    @DeleteMapping("/{cancioId}/colaboradores/{id}")
+    public ResponseEntity<List<ColaboracionDto>> eliminarColaborador(@PathVariable Long cancionId,@PathVariable Long id) {
+        List<ColaboracionDto> lista = cancionService.eliminarColaborador(cancionId,id);
+        return ResponseEntity.ok(lista);
+    }
+
+
+
 
 }
