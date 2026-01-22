@@ -52,31 +52,42 @@ public class AlbumService {
     }
 
     @Transactional
-    public void añadirCancionAlbum(Long idCancion , Long idAlbum){
+    public List<CancionBasicDto> añadirCancionAlbum(Long idCancion, Long idAlbum) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
-
-        Album album = repository.findById(Integer.parseInt(String.valueOf(idAlbum)))
-                .orElseThrow(() -> new RuntimeException("album no encontrado"));
 
         if (usuario.getDatosArtista() == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres artista");
         }
 
+        Album album = repository.findById(idAlbum.intValue())
+                .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
+
         if (!album.getArtista().getId().equals(usuario.getDatosArtista().getId())) {
-            throw new RuntimeException("No tienes permiso para editar este Album");
+            throw new RuntimeException("No tienes permiso para editar este Álbum");
         }
 
         Cancion cancion = cancionRepository.findById(idCancion)
-                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
-       cancion.setAlbum(album);
+        cancion.setAlbum(album);
+        cancionRepository.save(cancion);
 
-       cancionRepository.save(cancion);
+        if (!album.getCanciones().contains(cancion)) {
+            album.getCanciones().add(cancion);
+        }
+
+        return album.getCanciones().stream()
+                .map(c -> new CancionBasicDto(
+                        String.valueOf(c.getId()),
+                        c.getTitulo(),
+                        c.getFoto()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void eliminarCancionAlbum(Long idCancion , Long idAlbum){
+    public List<CancionBasicDto> eliminarCancionAlbum(Long idCancion, Long idAlbum) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
 
@@ -84,23 +95,32 @@ public class AlbumService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres artista");
         }
 
-        Album album = repository.findById(Integer.parseInt(String.valueOf(idAlbum)))
-                .orElseThrow(() -> new RuntimeException("album no encontrado"));
+        Album album = repository.findById(idAlbum.intValue())
+                .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
 
         if (!album.getArtista().getId().equals(usuario.getDatosArtista().getId())) {
-            throw new RuntimeException("No tienes permiso para editar este Album");
+            throw new RuntimeException("No tienes permiso para editar este Álbum");
         }
 
         Cancion cancion = cancionRepository.findById(idCancion)
-                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
         if (cancion.getAlbum() == null || !cancion.getAlbum().getId().equals(album.getId())) {
             throw new RuntimeException("Esta canción no pertenece al álbum indicado");
         }
 
         cancion.setAlbum(null);
-
         cancionRepository.save(cancion);
+
+        album.getCanciones().remove(cancion);
+
+        return album.getCanciones().stream()
+                .map(c -> new CancionBasicDto(
+                        String.valueOf(c.getId()),
+                        c.getTitulo(),
+                        c.getFoto()
+                ))
+                .collect(Collectors.toList());
     }
 
     private AlbumDto convertirADto(Album album) {
