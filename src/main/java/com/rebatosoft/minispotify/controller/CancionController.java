@@ -3,7 +3,6 @@ package com.rebatosoft.minispotify.controller;
 import com.rebatosoft.minispotify.dto.CancionDto;
 import com.rebatosoft.minispotify.dto.ColaboracionDto;
 import com.rebatosoft.minispotify.dto.requests.CancionRequest;
-import com.rebatosoft.minispotify.dto.requests.ColaboracionRequest;
 import com.rebatosoft.minispotify.service.CancionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.*;
 import java.util.List;
 
-@RestController("/canciones")
+@RestController
+@RequestMapping("/canciones")
 @RequiredArgsConstructor
 public class CancionController {
 
@@ -55,13 +54,13 @@ public class CancionController {
 
     // Metodos de Colaboraciones
     @PostMapping("/{id}/colaboradores")
-     public ResponseEntity<List<ColaboracionDto>> añadirColaborador(@PathVariable("id") Long id, @RequestParam List<Integer> colaboracion) {
+    public ResponseEntity<List<ColaboracionDto>> anadirColaborador(@PathVariable("id") Long id, @RequestParam List<Integer> colaboracion) {
         List<ColaboracionDto> colaboracionDto = cancionService.agregarColaboradores(colaboracion,id.intValue());
         return ResponseEntity.ok(colaboracionDto);
     }
 
 
-    @DeleteMapping("/{cancioId}/colaboradores/{id}")
+    @DeleteMapping("/{cancionId}/colaboradores/{id}")
     public ResponseEntity<List<ColaboracionDto>> eliminarColaborador(@PathVariable Long cancionId,@PathVariable Long id) {
         List<ColaboracionDto> lista = cancionService.eliminarColaborador(cancionId,id);
         return ResponseEntity.ok(lista);
