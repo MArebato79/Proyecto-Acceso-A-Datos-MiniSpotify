@@ -6,6 +6,7 @@ import com.rebatosoft.minispotify.dto.requests.AlbumRequest;
 import com.rebatosoft.minispotify.entities.componentes.Cancion;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.service.AlbumService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,21 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController("/albums")
+@RestController
+@RequestMapping("/albums")
 @RequiredArgsConstructor
 public class AlbumController {
 
     private final AlbumService albumService;
 
     @PostMapping
-    public ResponseEntity<AlbumDto> crearAlbum(@RequestBody AlbumRequest albumRequest){
+    public ResponseEntity<AlbumDto> crearAlbum(@RequestBody @Valid AlbumRequest albumRequest){
         AlbumDto albumDto = albumService.crearAlbum(albumRequest);
         return ResponseEntity.ok(albumDto);
     }
 
     @PostMapping("/{albumId}/canciones/{cancionId}")
     public ResponseEntity<List<CancionBasicDto>> agregarCancionAlbum(@PathVariable Long albumId, @PathVariable Long cancionId){
-        List<CancionBasicDto> canciones = albumService.añadirCancionAlbum(albumId, cancionId);
+        List<CancionBasicDto> canciones = albumService.añadirCancionAlbum(cancionId,albumId );
         return ResponseEntity.ok(canciones);
     }
 

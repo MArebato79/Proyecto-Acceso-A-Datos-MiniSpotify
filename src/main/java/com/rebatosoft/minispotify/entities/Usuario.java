@@ -23,8 +23,10 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String username;
+
     private String correo;
-    private String contraseña;
+    private String contrasena;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "usuario",fetch = FetchType.EAGER)
     private List<Playlist> playlists;

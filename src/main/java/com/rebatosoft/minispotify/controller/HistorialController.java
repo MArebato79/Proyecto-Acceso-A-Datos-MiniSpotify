@@ -14,12 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class HistorialController {
 
     private final HistorialService historialService;
-
-    @PostMapping
-    public ResponseEntity<Object> registrarEscucha(@RequestBody Long cancionId){
+    @PostMapping("/escuchar/{cancionId}")
+    public ResponseEntity<Void> registrarEscucha(@PathVariable Long cancionId) {
         historialService.registrarEscucha(cancionId);
-        return ResponseEntity.ok().build();
-
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

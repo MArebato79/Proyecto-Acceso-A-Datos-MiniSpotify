@@ -106,7 +106,7 @@ public class PlaylistService {
         entradaPlaylistRepository.save(entrada);
     }
 
-    private List<PlaylistDto> getMyPlaylist(){
+    public List<PlaylistDto> getMyPlaylist(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
 
