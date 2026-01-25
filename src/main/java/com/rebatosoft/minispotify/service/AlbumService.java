@@ -15,16 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@CrossOrigin(value = "*")
 public class AlbumService {
 
     private final AlbumRepository repository;
@@ -41,11 +39,11 @@ public class AlbumService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es artista");
         }
 
-        Artista artista = artistaRepository.findById(usuario.getDatosArtista().getId());
+        Optional<Artista> artista = artistaRepository.findById(usuario.getDatosArtista().getId());
 
         Album album = new Album();
         album.setNombre(albumRequest.titulo());
-        album.setArtista(artista);
+        album.setArtista(artista.get());
         album.setFoto(albumRequest.imagenUrl());
 
         return convertirADto(repository.save(album));

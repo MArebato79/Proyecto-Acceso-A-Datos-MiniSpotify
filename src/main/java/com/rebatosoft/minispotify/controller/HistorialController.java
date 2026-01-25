@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/historial")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class HistorialController {
 
     private final HistorialService historialService;

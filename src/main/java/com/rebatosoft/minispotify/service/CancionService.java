@@ -16,14 +16,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@CrossOrigin(value = "*")
 public class CancionService {
 
     private final AlbumRepository albumRepository;
@@ -74,8 +73,8 @@ public class CancionService {
 
                 if (colab.getArtistaColaborador() != null) {
                     Long idArtista = colab.getArtistaColaborador().getId();
-                    Artista artistaReal = artistaRepository.findById(idArtista);
-                    colab.setArtistaColaborador(artistaReal);
+                    Optional<Artista> artistaReal = artistaRepository.findById(idArtista);
+                    colab.setArtistaColaborador(artistaReal.get());
                 }
             }
 

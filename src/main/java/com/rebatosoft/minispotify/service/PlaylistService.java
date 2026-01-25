@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@CrossOrigin(value = "*")
 public class PlaylistService {
 
     private final CancionRepository cancionRepository;

@@ -43,7 +43,7 @@ public class ArtistaService {
     }
 
     public ArtistaDto getArtistaById(Integer id) {
-        Artista artista = artistaRepository.findById(id)
+        Artista artista = artistaRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("Artista no encontrado con ID: " + id));
         return convertirADto(artista);
     }

@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@CrossOrigin(value = "*")
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
