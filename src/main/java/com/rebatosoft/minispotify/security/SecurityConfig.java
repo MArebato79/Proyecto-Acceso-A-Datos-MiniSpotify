@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .findFirst()
                 .map(u -> User.builder()
                         .username(u.getCorreo())
-                        .password(u.getContraseña())
+                        .password(u.getContrasena())
                         .roles(u.getDatosArtista() != null ? "ARTIST" : "USER") // Rol dinámico
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
@@ -45,7 +45,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Login y Registro públicos
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
