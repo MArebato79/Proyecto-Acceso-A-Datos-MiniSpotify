@@ -40,7 +40,7 @@ public class Cancion {
     @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
     private Album album;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cancion", fetch = FetchType.LAZY)
     private List<EntradaPlaylist> entradaPlaylists;
 
 }

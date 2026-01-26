@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface ArtistaRepository extends JpaRepository<Artista, Long> {
     List<Artista> findByNombreContainingIgnoreCase(String termino);
-    List<Artista> findAllById(List<Integer> colaboradoresIds);
 }

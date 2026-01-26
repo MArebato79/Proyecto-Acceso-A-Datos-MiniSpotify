@@ -222,8 +222,11 @@ public class CancionService {
         if (!cancion.getAutor().getId().equals(usuario.getDatosArtista().getId())) {
             throw new RuntimeException("No puedes añadir colaboradores a una canción que no es tuya");
         }
+        List<Long> idsLong = colaboradoresIds.stream()
+                .map(Integer::longValue)
+                .collect(Collectors.toList());
 
-        List<Artista> artistasInvitados = artistaRepository.findAllById(colaboradoresIds);
+        List<Artista> artistasInvitados = artistaRepository.findAllById(idsLong);
 
         List<Colaboracion> nuevasColaboraciones = artistasInvitados.stream()
                 .filter(artista -> !artista.getId().equals(usuario.getDatosArtista().getId()))

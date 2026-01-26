@@ -33,6 +33,6 @@ public class Playlist {
     @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
     private Usuario usuario;
 
-    @OneToMany(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER,orphanRemoval = true)
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<EntradaPlaylist> cancionesEntradas;
 }
