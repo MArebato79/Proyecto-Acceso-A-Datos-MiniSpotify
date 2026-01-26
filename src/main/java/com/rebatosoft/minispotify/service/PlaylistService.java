@@ -77,6 +77,10 @@ public class PlaylistService {
             throw new RuntimeException("No tienes permiso para eliminar esta playlist");
         }
 
+        if (usuario.getPlaylists() != null) {
+            usuario.getPlaylists().removeIf(p -> p.getId().equals(playlist.getId()));
+        }
+
         playlistRepository.delete(playlist);
     }
 
