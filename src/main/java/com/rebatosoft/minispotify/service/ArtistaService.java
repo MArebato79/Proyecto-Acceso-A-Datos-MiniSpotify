@@ -61,7 +61,6 @@ public class ArtistaService {
 
         artista.setNombre(request.nombre());
         artista.setBiografia(request.biografia());
-        artista.setFoto(request.imagenUrl());
 
         artista = artistaRepository.save(artista);
         return convertirADto(artista);
@@ -107,7 +106,7 @@ public class ArtistaService {
         Artista a = new Artista();
         a.setNombre(request.nombre());
         a.setBiografia(request.biografia());
-        a.setFoto(request.imagenUrl());
+        a.setFoto(usuarioOwner.getFotoUrl());
 
         a.setUsuarioPropietario(usuarioOwner);
 

@@ -3,6 +3,7 @@ package com.rebatosoft.minispotify.service;
 import com.rebatosoft.minispotify.dto.UsuarioDto;
 import com.rebatosoft.minispotify.dto.basicsDto.ArtistaBasicDto;
 import com.rebatosoft.minispotify.dto.requests.RegisterRequest;
+import com.rebatosoft.minispotify.dto.requests.UpdateUserRequest;
 import com.rebatosoft.minispotify.entities.Usuario;
 import com.rebatosoft.minispotify.entities.componentes.Artista;
 import com.rebatosoft.minispotify.entities.componentes.Follow;
@@ -39,6 +40,7 @@ public class UsuarioService {
         usuario.setUsername(request.userName()); // Si tienes este campo
         // Encriptamos la contraseña antes de guardar
         usuario.setContrasena(passwordEncoder.encode(request.password()));
+        usuario.setFotoUrl(request.imagenUrl());
 
         return convertirADto(usuarioRepository.save(usuario));
     }
@@ -95,16 +97,42 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
+    public UsuarioDto updateUser(UpdateUserRequest request) {
+        // 1. Obtener el usuario autenticado
+        String emailActual = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(emailActual)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 2. Actualizar Username
+        if (request.username() != null && !request.username().isBlank()) {
+            usuario.setUsername(request.username());
+            if (usuario.getDatosArtista() != null) {
+                usuario.getDatosArtista().setNombre(request.username());
+            }
+        }
+
+        if (request.foto() != null && !request.foto().isBlank()) {
+            usuario.setFotoUrl(request.foto());
+            if (usuario.getDatosArtista() != null) {
+                usuario.getDatosArtista().setFoto(request.foto());
+            }
+        }
+
+        return convertirADto(usuarioRepository.save(usuario));
+    }
+
     private UsuarioDto convertirADto(Usuario usuario) {
         UsuarioDto dto = new UsuarioDto();
         dto.setId(usuario.getId().toString());
-        dto.setUsername(usuario.getCorreo());
+        dto.setUsername(usuario.getUsername());
         dto.setEmail(usuario.getCorreo());
+        dto.setAvatarUrl(usuario.getFotoUrl());
 
         if (usuario.getDatosArtista() != null) {
             ArtistaBasicDto artDto = new ArtistaBasicDto();
             artDto.setId(usuario.getDatosArtista().getId().toString());
             artDto.setNombre(usuario.getDatosArtista().getNombre());
+            artDto.setImagenUrl(usuario.getFotoUrl());
             dto.setPerfilArtista(artDto);
         }
         return dto;

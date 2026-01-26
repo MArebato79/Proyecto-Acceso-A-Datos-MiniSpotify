@@ -28,6 +28,8 @@ public class Usuario {
     private String correo;
     private String contrasena;
 
+    private String fotoUrl;
+
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "usuario",fetch = FetchType.EAGER)
     private List<Playlist> playlists;
 

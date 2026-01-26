@@ -3,6 +3,7 @@ package com.rebatosoft.minispotify.controller;
 import com.rebatosoft.minispotify.dto.UsuarioDto;
 import com.rebatosoft.minispotify.dto.basicsDto.ArtistaBasicDto;
 import com.rebatosoft.minispotify.dto.requests.RegisterRequest;
+import com.rebatosoft.minispotify.dto.requests.UpdateUserRequest;
 import com.rebatosoft.minispotify.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,11 @@ public class UsuarioController {
     public ResponseEntity<UsuarioDto> registrarUsuario(@RequestBody @Valid RegisterRequest request) {
         UsuarioDto nuevoUsuario = usuarioService.registerUser(request);
         return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UsuarioDto> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+        return ResponseEntity.ok(usuarioService.updateUser(request));
     }
 
     // 2. SEGUIR ARTISTA
