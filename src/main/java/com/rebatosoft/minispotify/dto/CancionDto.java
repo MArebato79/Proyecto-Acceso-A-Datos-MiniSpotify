@@ -14,6 +14,7 @@ public class CancionDto {
     private Long id;
     private String titulo;
     private String imagenUrl;
+    private String publica;
     private String genero;
     private ArtistaDto artista;
     private String colaboraciones;

@@ -121,6 +121,27 @@ public class AlbumService {
                 .collect(Collectors.toList());
     }
 
+  public List<AlbumDto> getAlbumsByArtista() {
+      String email = SecurityContextHolder.getContext().getAuthentication().getName();
+      Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+
+      if (usuario.getDatosArtista() == null) {
+          throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres artista");
+      }
+
+      List<AlbumDto> albums = repository.findAllByArtistaId(usuario.getDatosArtista().getId()).stream()
+              .map(this::convertirADto)
+              .collect(Collectors.toList());
+
+      return albums;
+   }
+
+    public List<AlbumDto> getAllAlbums() {
+        return repository.findAll().stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
     private AlbumDto convertirADto(Album album) {
         AlbumDto dto = new AlbumDto();
         dto.setId(album.getId().toString());

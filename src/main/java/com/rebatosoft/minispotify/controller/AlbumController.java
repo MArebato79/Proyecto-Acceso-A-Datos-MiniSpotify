@@ -1,6 +1,7 @@
 package com.rebatosoft.minispotify.controller;
 
 import com.rebatosoft.minispotify.dto.AlbumDto;
+import com.rebatosoft.minispotify.dto.CancionDto;
 import com.rebatosoft.minispotify.dto.basicsDto.CancionBasicDto;
 import com.rebatosoft.minispotify.dto.requests.AlbumRequest;
 import com.rebatosoft.minispotify.entities.componentes.Cancion;
@@ -21,6 +22,18 @@ import java.util.List;
 public class AlbumController {
 
     private final AlbumService albumService;
+
+    @GetMapping
+    public ResponseEntity<List<AlbumDto>> getAllAlbums() {
+        List<AlbumDto> albumDtos = albumService.getAllAlbums();
+        return ResponseEntity.ok(albumDtos);
+    }
+
+    @GetMapping("/artista")
+    public ResponseEntity<List<AlbumDto>> getAllAlbumsByArtista(Long artistaId) {
+        List<AlbumDto> album = albumService.getAlbumsByArtista();
+        return ResponseEntity.ok(album);
+    }
 
     @PostMapping
     public ResponseEntity<AlbumDto> crearAlbum(@RequestBody @Valid AlbumRequest albumRequest){

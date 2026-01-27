@@ -1,6 +1,7 @@
 package com.rebatosoft.minispotify.controller;
 
 import com.rebatosoft.minispotify.dto.PlaylistDto;
+import com.rebatosoft.minispotify.dto.basicsDto.PlaylistBasicDto;
 import com.rebatosoft.minispotify.dto.requests.PlaylistRequest;
 import com.rebatosoft.minispotify.entities.componentes.Cancion;
 import com.rebatosoft.minispotify.service.CancionService;
@@ -38,12 +39,6 @@ public class PlaylistController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<PlaylistDto>> obtenerPlaylistsUsuario() {
-        List<PlaylistDto> playlists = playlistService.getMyPlaylist();
-        return ResponseEntity.ok(playlists);
-    }
-
     // ENDPOINTS PARA AGREGAR Y REMOVER CANCIONES DE LA PLAYLIST
 
     @PostMapping("/{playlistId}/canciones/{cancionId}")
@@ -56,5 +51,11 @@ public class PlaylistController {
     public ResponseEntity<Void> removerCancionDePlaylist(@PathVariable Long playlistId, @PathVariable Long cancionId) {
         playlistService.eliminarCancionPlaylist(cancionId, playlistId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<PlaylistBasicDto>> obtenerMyPlaylist() {
+        List<PlaylistBasicDto> playlists = playlistService.getMyPlaylist();
+        return ResponseEntity.ok(playlists);
     }
 }

@@ -147,6 +147,7 @@ public class CancionService {
         dto.setId((long) cancion.getId());
         dto.setTitulo(cancion.getTitulo());
         dto.setGenero(cancion.getGenero() != null ? cancion.getGenero().toString() : null);
+        dto.setPublica(cancion.isPublica()?"Publica":"Privada");
 
         if (cancion.getAutor() != null) {
             ArtistaDto artDto = new ArtistaDto();
@@ -284,6 +285,20 @@ public class CancionService {
     public List<CancionDto> searchCanciones(String termino) {
         return cancionRepository.findByTituloContainingIgnoreCase(termino).stream()
                 .filter(Cancion::isPublica)
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
+    // 1. Obtener TODAS las canciones
+    public List<CancionDto> getAllCanciones() {
+        return cancionRepository.findAll().stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
+    // 2. Obtener canciones de un ARTISTA ESPECÍFICO
+    public List<CancionDto> getCancionesByArtista(Long idArtista) {
+        return cancionRepository.findByAutorId(idArtista).stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }

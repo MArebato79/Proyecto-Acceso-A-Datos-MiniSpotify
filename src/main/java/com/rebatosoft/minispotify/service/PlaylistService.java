@@ -4,6 +4,7 @@ import com.rebatosoft.minispotify.dto.EntradaPlaylistDto;
 import com.rebatosoft.minispotify.dto.PlaylistDto;
 import com.rebatosoft.minispotify.dto.basicsDto.ArtistaBasicDto;
 import com.rebatosoft.minispotify.dto.basicsDto.CancionBasicDto;
+import com.rebatosoft.minispotify.dto.basicsDto.PlaylistBasicDto;
 import com.rebatosoft.minispotify.dto.requests.PlaylistRequest;
 import com.rebatosoft.minispotify.entities.Usuario;
 import com.rebatosoft.minispotify.entities.componentes.Cancion;
@@ -109,12 +110,13 @@ public class PlaylistService {
         entradaPlaylistRepository.save(entrada);
     }
 
-    public List<PlaylistDto> getMyPlaylist(){
+    public List<PlaylistBasicDto> getMyPlaylist(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
 
         return playlistRepository.findByUsuario(usuario).stream()
                 .map(this::convertirADto)
+                .map(this::convertirBasicDto)
                 .collect(Collectors.toList());
     }
 
@@ -144,6 +146,15 @@ public class PlaylistService {
 
         playlist.getCancionesEntradas().remove(entrada);
         playlistRepository.save(playlist);
+    }
+
+    private PlaylistBasicDto convertirBasicDto(PlaylistDto playlistDto){
+        PlaylistBasicDto basicDto = new PlaylistBasicDto();
+            basicDto.setId(playlistDto.getId());
+            basicDto.setNombre(playlistDto.getNombre());
+            basicDto.setImagenUrl(playlistDto.getImagenUrl());
+
+            return  basicDto;
     }
 
 

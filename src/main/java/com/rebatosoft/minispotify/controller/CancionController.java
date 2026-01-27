@@ -68,6 +68,18 @@ public class CancionController {
     }
 
 
+    // Endpoint para ver TODAS las canciones
+    @GetMapping
+    public ResponseEntity<List<CancionDto>> listarTodas() {
+        return ResponseEntity.ok(cancionService.getAllCanciones());
+    }
+
+    // Endpoint para ver las canciones de un ARTISTA
+    @GetMapping("/artista/{id}")
+    public ResponseEntity<List<CancionDto>> listarPorArtista(@PathVariable Long id) {
+        return ResponseEntity.ok(cancionService.getCancionesByArtista(id));
+    }
+
 
 
 }
