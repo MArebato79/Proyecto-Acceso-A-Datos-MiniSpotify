@@ -6,9 +6,7 @@ import com.rebatosoft.minispotify.entities.componentes.Playlist;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.awt.print.Pageable;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
