@@ -13,10 +13,12 @@ import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.ColaboracionRepository;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -176,7 +178,7 @@ public class CancionService {
             dto.setRol(colab.getRol());
         }
 
-        dto.setRol(colab.getRol()); // "Feat", etc.
+        dto.setRol(colab.getRol());
         return dto;
     }
 
@@ -278,15 +280,9 @@ public class CancionService {
                 .collect(Collectors.toList());
     }
 
-
-
-    // metodos de busqueda
-
-    public List<CancionDto> searchCanciones(String termino) {
-        return cancionRepository.findByTituloContainingIgnoreCase(termino).stream()
-                .filter(Cancion::isPublica)
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public Page<CancionDto> searchCanciones(String termino, Pageable pageable) {
+        return cancionRepository.findByTituloContainingIgnoreCase(termino, pageable)
+                .map(this::convertirADto);
     }
 
     // 1. Obtener TODAS las canciones
@@ -308,8 +304,6 @@ public class CancionService {
                 .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
         if (!cancion.isPublica()) {
-            // Si es privada, solo el dueño debería poder verla.
-            // Aquí podrías meter lógica de seguridad extra.
         }
 
         return convertirADto(cancion);

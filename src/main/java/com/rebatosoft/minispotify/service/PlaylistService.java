@@ -17,10 +17,12 @@ import com.rebatosoft.minispotify.repositories.TablasIntermedias.EntradaPlaylist
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collector;
@@ -110,14 +112,12 @@ public class PlaylistService {
         entradaPlaylistRepository.save(entrada);
     }
 
-    public List<PlaylistBasicDto> getMyPlaylist(){
+    public Page<PlaylistDto> getMyPlaylist(Pageable pageable){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
 
-        return playlistRepository.findByUsuario(usuario).stream()
-                .map(this::convertirADto)
-                .map(this::convertirBasicDto)
-                .collect(Collectors.toList());
+        return playlistRepository.findByUsuario(usuario, pageable)
+                .map(this::convertirADto);
     }
 
     public PlaylistDto getPlaylistById(Long id){

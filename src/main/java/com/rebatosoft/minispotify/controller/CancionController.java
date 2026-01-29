@@ -6,10 +6,13 @@ import com.rebatosoft.minispotify.dto.requests.CancionRequest;
 import com.rebatosoft.minispotify.service.CancionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -48,8 +51,10 @@ public class CancionController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<CancionDto>> obtenerCancionesBuscador(@RequestParam String filtro) {
-        List<CancionDto> cancionesBuscadas = cancionService.searchCanciones(filtro);
+    public ResponseEntity<Page<CancionDto>> obtenerCancionesBuscador(
+            @RequestParam String filtro,
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        Page<CancionDto> cancionesBuscadas = cancionService.searchCanciones(filtro, pageable);
         return ResponseEntity.ok(cancionesBuscadas);
     }
 

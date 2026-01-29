@@ -8,9 +8,12 @@ import com.rebatosoft.minispotify.service.CancionService;
 import com.rebatosoft.minispotify.service.PlaylistService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -53,9 +56,11 @@ public class PlaylistController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/my")
-    public ResponseEntity<List<PlaylistBasicDto>> obtenerMyPlaylist() {
-        List<PlaylistBasicDto> playlists = playlistService.getMyPlaylist();
+    @GetMapping
+    public ResponseEntity<Page<PlaylistDto>> obtenerPlaylistsUsuario(
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+
+        Page<PlaylistDto> playlists = playlistService.getMyPlaylist(pageable);
         return ResponseEntity.ok(playlists);
     }
 
