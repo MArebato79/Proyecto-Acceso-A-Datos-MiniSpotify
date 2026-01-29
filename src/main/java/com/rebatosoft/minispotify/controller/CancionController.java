@@ -80,6 +80,10 @@ public class CancionController {
         return ResponseEntity.ok(cancionService.getCancionesByArtista(id));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CancionDto> getCancionById(@PathVariable Long id) {
+        return ResponseEntity.ok(cancionService.getCancionById(id));
+    }
 
 
 }

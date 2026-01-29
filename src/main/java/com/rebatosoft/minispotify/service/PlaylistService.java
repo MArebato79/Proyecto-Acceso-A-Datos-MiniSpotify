@@ -120,6 +120,13 @@ public class PlaylistService {
                 .collect(Collectors.toList());
     }
 
+    public PlaylistDto getPlaylistById(Long id){
+        PlaylistDto playlistDto=convertirADto(playlistRepository.findById(id.intValue())
+                .orElseThrow(() -> new RuntimeException("Playlist no encontrada")));
+        return playlistDto;
+    }
+
+
     @Transactional
     public void eliminarCancionPlaylist(Long idCancion , Long idPlaylist){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

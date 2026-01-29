@@ -35,6 +35,11 @@ public class AlbumController {
         return ResponseEntity.ok(album);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AlbumDto> getAlbumById(@PathVariable Long id) {
+        return ResponseEntity.ok(albumService.getAlbumById(id));
+    }
+
     @PostMapping
     public ResponseEntity<AlbumDto> crearAlbum(@RequestBody @Valid AlbumRequest albumRequest){
         AlbumDto albumDto = albumService.crearAlbum(albumRequest);

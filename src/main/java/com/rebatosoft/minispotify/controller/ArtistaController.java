@@ -45,4 +45,9 @@ public class ArtistaController {
         List<ArtistaDto> artistas = artistaService.searchArtista(search);
         return ResponseEntity.ok(artistas);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ArtistaDto> getArtistaById(@PathVariable Long id) {
+        return ResponseEntity.ok(artistaService.getArtistaById(id.intValue()));
+    }
 }

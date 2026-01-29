@@ -142,6 +142,11 @@ public class AlbumService {
                 .collect(Collectors.toList());
     }
 
+    public AlbumDto getAlbumById(Long id) {
+        AlbumDto albumDto = convertirADto(repository.findById(id.intValue()).orElseThrow(null));
+        return albumDto;
+    }
+
     private AlbumDto convertirADto(Album album) {
         AlbumDto dto = new AlbumDto();
         dto.setId(album.getId().toString());
