@@ -279,6 +279,17 @@ public class CancionService {
                 .collect(Collectors.toList());
     }
 
+    public void cambiarAlbum(Long cancionId, Long albumId) {
+        Cancion cancion = cancionRepository.findById(cancionId)
+                .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
+
+        Album album = albumRepository.findById(albumId.intValue())
+                .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
+
+        cancion.setAlbum(album);
+        cancionRepository.save(cancion);
+    }
+
     public Page<CancionDto> searchCanciones(String termino, Pageable pageable) {
         return cancionRepository.findByTituloContainingIgnoreCase(termino, pageable)
                 .map(this::convertirADto);
@@ -290,6 +301,7 @@ public class CancionService {
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
+
 
     // 2. Obtener canciones de un ARTISTA ESPECÍFICO
     public List<CancionDto> getCancionesByArtista(Long idArtista) {

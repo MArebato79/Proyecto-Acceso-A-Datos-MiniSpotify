@@ -22,6 +22,7 @@ import java.util.List;
 public class PlaylistController {
 
     final PlaylistService playlistService;
+    final CancionService cancionService;
 
     @PostMapping
     public ResponseEntity<PlaylistDto> crearPlaylist(@RequestBody @Valid PlaylistRequest playlistRequest) {
@@ -41,8 +42,6 @@ public class PlaylistController {
         return ResponseEntity.noContent().build();
     }
 
-    // ENDPOINTS PARA AGREGAR Y REMOVER CANCIONES DE LA PLAYLIST
-
     @PostMapping("/{playlistId}/canciones/{cancionId}")
     public ResponseEntity<Void> agregarCancionAPlaylist(@PathVariable Long playlistId, @PathVariable Long cancionId  ) {
         playlistService.añadirCancionPlaylist(cancionId,playlistId);
@@ -53,6 +52,11 @@ public class PlaylistController {
     public ResponseEntity<Void> removerCancionDePlaylist(@PathVariable Long playlistId, @PathVariable Long cancionId) {
         playlistService.eliminarCancionPlaylist(cancionId, playlistId);
         return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/{albumId}/canciones/vincular/{cancionId}")
+    public ResponseEntity<Void> vincularCancion(@PathVariable Long albumId, @PathVariable Long cancionId) {
+        cancionService.cambiarAlbum(cancionId, albumId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping

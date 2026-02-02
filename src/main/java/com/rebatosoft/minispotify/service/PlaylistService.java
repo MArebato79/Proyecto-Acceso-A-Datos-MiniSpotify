@@ -43,7 +43,7 @@ public class PlaylistService {
 
         Playlist list = new Playlist();
         list.setTitulo(playlist.nombre());
-        list.setPublica(playlist.publica());
+        list.setPublica(playlist.publica() != null ? playlist.publica() : true);
         list.setUsuario(usuario);
         list.setFoto(null);
 
@@ -60,7 +60,7 @@ public class PlaylistService {
 
         playlist.setTitulo(playlistRequest.nombre());
         playlist.setDescripcion(playlistRequest.descripcion());
-        playlist.setPublica(playlistRequest.publica());
+        if (playlistRequest.publica() != null) playlist.setPublica(playlist.getPublica());
         playlist.setFoto(playlistRequest.imagenUrl());
 
         return convertirADto(playlistRepository.save(playlist));
@@ -169,7 +169,7 @@ public class PlaylistService {
         dto.setId(playlist.getId().toString());
         dto.setNombre(playlist.getTitulo());
         dto.setImagenUrl(playlist.getFoto());
-        dto.setPublica(playlist.isPublica());
+        dto.setPublica(playlist.getPublica());
 
         if (playlist.getCancionesEntradas() != null) {
             List<EntradaPlaylistDto> entradas = playlist.getCancionesEntradas().stream()

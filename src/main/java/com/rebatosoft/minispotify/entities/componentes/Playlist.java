@@ -28,7 +28,7 @@ public class Playlist {
 
     private int numeroCanciones;
 
-    private boolean publica;
+    private Boolean publica;
 
     @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
     private Usuario usuario;
