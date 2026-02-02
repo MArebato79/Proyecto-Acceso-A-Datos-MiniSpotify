@@ -45,7 +45,8 @@ public class PlaylistService {
         list.setTitulo(playlist.nombre());
         list.setPublica(playlist.publica() != null ? playlist.publica() : true);
         list.setUsuario(usuario);
-        list.setFoto(null);
+        list.setFoto(playlist.imagenUrl());
+        list.setDescripcion(playlist.descripcion());
 
         return convertirADto(playlistRepository.save(list));
 

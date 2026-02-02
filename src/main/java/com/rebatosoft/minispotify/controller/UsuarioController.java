@@ -28,9 +28,9 @@ public class UsuarioController {
         return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<UsuarioDto> updateUser(@RequestBody @Valid UpdateUserRequest request) {
-        return ResponseEntity.ok(usuarioService.updateUser(request));
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioDto> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(usuarioService.updateUser(id, request));
     }
 
     // 2. SEGUIR ARTISTA

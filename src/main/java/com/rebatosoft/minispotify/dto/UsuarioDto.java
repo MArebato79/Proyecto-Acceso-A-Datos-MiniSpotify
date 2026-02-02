@@ -1,10 +1,14 @@
 package com.rebatosoft.minispotify.dto;
 
 import com.rebatosoft.minispotify.dto.basicsDto.ArtistaBasicDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class UsuarioDto {
     private String id;
     private String username;

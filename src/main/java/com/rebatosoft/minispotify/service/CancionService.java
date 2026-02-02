@@ -45,6 +45,7 @@ public class CancionService {
         Cancion cancion = new Cancion();
         cancion.setTitulo(request.titulo());
         cancion.setPublica(request.publica());
+        cancion.setFoto(request.imagenUrl());
 
         try {
             cancion.setGenero(GENEROS.valueOf(request.genero().toUpperCase()));

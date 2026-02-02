@@ -52,6 +52,11 @@ public class AlbumController {
         return ResponseEntity.ok(canciones);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<AlbumDto> updateAlbum(@PathVariable Long id, @RequestBody AlbumRequest albumRequest) {
+        return ResponseEntity.ok(albumService.updateAlbum(id, albumRequest));
+    }
+
     @DeleteMapping("/{albumId}/canciones/{cancionId}")
     public ResponseEntity<List<CancionBasicDto>> eliminarCancionAlbum(@PathVariable Long albumId, @PathVariable Long cancionId){
         List<CancionBasicDto> canciones = albumService.eliminarCancionAlbum(albumId, cancionId);

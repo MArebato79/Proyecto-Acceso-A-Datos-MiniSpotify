@@ -97,28 +97,38 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    public UsuarioDto updateUser(UpdateUserRequest request) {
-        // 1. Obtener el usuario autenticado
-        String emailActual = SecurityContextHolder.getContext().getAuthentication().getName();
-        Usuario usuario = usuarioRepository.findByCorreo(emailActual)
+
+    public UsuarioDto updateUser(Long id, UpdateUserRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 2. Actualizar Username
-        if (request.username() != null && !request.username().isBlank()) {
+        if (request.username() != null && !request.username().isEmpty()) {
             usuario.setUsername(request.username());
-            if (usuario.getDatosArtista() != null) {
-                usuario.getDatosArtista().setNombre(request.username());
-            }
         }
 
-        if (request.foto() != null && !request.foto().isBlank()) {
+        if (request.foto() != null) {
             usuario.setFotoUrl(request.foto());
-            if (usuario.getDatosArtista() != null) {
-                usuario.getDatosArtista().setFoto(request.foto());
-            }
         }
 
-        return convertirADto(usuarioRepository.save(usuario));
+        Usuario guardado = usuarioRepository.save(usuario);
+
+        ArtistaBasicDto artistaDto = null;
+
+        if (guardado.getDatosArtista() != null) {
+            artistaDto = new ArtistaBasicDto(
+                    String.valueOf(guardado.getDatosArtista().getId()),
+                    guardado.getDatosArtista().getNombre(),
+                    guardado.getDatosArtista().getFoto()
+            );
+        }
+
+        return new UsuarioDto(
+                guardado.getId().toString(),
+                guardado.getUsername(),
+                guardado.getCorreo(),
+                guardado.getFotoUrl(),
+                artistaDto
+        );
     }
 
     private UsuarioDto convertirADto(Usuario usuario) {

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -24,10 +25,14 @@ public class Album {
 
     private String foto;
 
+    private Boolean publico;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Artista artista;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "album")
     private List<Cancion> canciones;
+
+    private LocalDate fechaLanzamiento;
 
 }

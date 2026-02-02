@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,6 +49,50 @@ public class AlbumService {
         album.setFoto(albumRequest.imagenUrl());
 
         return convertirADto(repository.save(album));
+    }
+
+    public AlbumDto updateAlbum(Long id, AlbumRequest request) {
+        Album album = repository.findById(id.intValue())
+                .orElseThrow(() -> new RuntimeException("Álbum no encontrado con ID: " + id));
+
+        album.setNombre(request.titulo());
+        album.setFechaLanzamiento(LocalDate.now());
+
+        if (request.imagenUrl() != null && !request.imagenUrl().isEmpty()) {
+            album.setFoto(request.imagenUrl());
+        }
+        album.setPublico(request.publico() != null ? request.publico() : album.getPublico());
+
+        Album actualizado = repository.save(album);
+
+        Artista artistaEntity = actualizado.getArtista();
+        ArtistaBasicDto artistaBasic = new ArtistaBasicDto(
+                String.valueOf(artistaEntity.getId()),
+                artistaEntity.getNombre(),
+                artistaEntity.getFoto()
+        );
+        List<CancionBasicDto> cancionesDto = new ArrayList<>();
+
+        if (actualizado.getCanciones() != null) {
+            cancionesDto = actualizado.getCanciones().stream()
+                    .map(cancion -> new CancionBasicDto(
+                            String.valueOf(cancion.getId()),
+                            cancion.getTitulo(),
+                            (cancion.getFoto() != null && !cancion.getFoto().isEmpty())
+                                    ? cancion.getFoto()
+                                    : actualizado.getFoto()
+                    ))
+                    .collect(Collectors.toList());
+        }
+
+        return new AlbumDto(
+                String.valueOf(actualizado.getId()),
+                actualizado.getNombre(),
+                actualizado.getFoto(),
+                artistaBasic,
+                cancionesDto
+        );
+
     }
 
     @Transactional
