@@ -29,24 +29,29 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
-        // 1. Esto autentica contra Spring Security (comprueba usuario y contraseña)
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
-        // 2. Si pasa la línea anterior, es que las credenciales son buenas. Buscamos al usuario
         Usuario usuario = usuarioRepository.findByCorreo(request.email()).orElseThrow();
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
 
-        // 3. Generamos el Token.
         Long artistId = (usuario.getDatosArtista() != null) ? usuario.getDatosArtista().getId() : null;
-
         String token = jwtService.generateToken(userDetails, artistId);
 
-        // 4. Devolvemos el token en un JSON
-        Map<String, String> response = new HashMap<>();
+        // CREAMOS UNA RESPUESTA COMPLETA
+        Map<String, Object> response = new HashMap<>();
         response.put("token", token);
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("id", usuario.getId());
+        userData.put("username", usuario.getUsername());
+        userData.put("email", usuario.getCorreo());
+        userData.put("artistId", artistId);
+
+        response.put("user", userData);
+
         return ResponseEntity.ok(response);
     }
 }

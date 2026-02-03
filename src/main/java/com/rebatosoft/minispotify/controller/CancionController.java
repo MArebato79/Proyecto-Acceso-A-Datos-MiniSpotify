@@ -3,6 +3,7 @@ package com.rebatosoft.minispotify.controller;
 import com.rebatosoft.minispotify.dto.CancionDto;
 import com.rebatosoft.minispotify.dto.ColaboracionDto;
 import com.rebatosoft.minispotify.dto.requests.CancionRequest;
+import com.rebatosoft.minispotify.entities.componentes.GENEROS;
 import com.rebatosoft.minispotify.service.CancionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -23,6 +26,15 @@ public class CancionController {
     private final CancionService cancionService;
 
     // Metodos de Cancion
+
+    @GetMapping("/generos")
+    public ResponseEntity<List<String>> getGeneros() {
+        // Convierte los valores del Enum a una lista de Strings
+        List<String> generos = Arrays.stream(GENEROS.values())
+                .map(Enum::name)
+                .toList();
+        return ResponseEntity.ok(generos);
+    }
 
     @PostMapping()
     public ResponseEntity<CancionDto> crearCancion(@RequestBody @Valid CancionRequest cancion) {
