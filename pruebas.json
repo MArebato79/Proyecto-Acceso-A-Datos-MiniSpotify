@@ -1,0 +1,332 @@
+{
+  "GUION_VIDEO_CORREGIDO_REAL": {
+    "instrucciones": "Estos JSON coinciden EXACTAMENTE con tus archivos Java. Úsalos en Postman.",
+
+    "PERFIL_1_NEO_SYNTH": {
+      "rol": "Protagonista para el vídeo",
+      "pasos": [
+        {
+          "accion": "1. REGISTRO",
+          "endpoint": "POST /auth/register",
+          "body": {
+            "userName": "Neo_Synth",
+            "email": "neo@demo.com",
+            "password": "1234",
+            "imagenUrl": "https://placehold.co/400x400/purple/cyan?text=Neo"
+          }
+        },
+        {
+          "accion": "2. LOGIN",
+          "endpoint": "POST /auth/login",
+          "body": {
+            "email": "neo@demo.com",
+            "password": "1234"
+          }
+        },
+        {
+          "accion": "3. CREAR ARTISTA",
+          "endpoint": "POST /artistas",
+          "nota": "Tu DTO solo pide nombre y biografía. No pongas foto ni género.",
+          "body": {
+            "nombre": "Neon Rider",
+            "biografia": "Synthwave y ritmos retro-futuristas."
+          }
+        },
+        {
+          "accion": "4. CREAR ÁLBUM",
+          "endpoint": "POST /albumes",
+          "nota": "IMPORTANTE: Copia el ID que te devuelva. Parametros: titulo, publico (no publica), imagenUrl.",
+          "body": {
+            "titulo": "Nightcall",
+            "publico": true,
+            "imagenUrl": "https://placehold.co/500x500/1a1a1a/ff00ff?text=Night"
+          }
+        },
+        {
+          "accion": "5. SUBIR CANCIÓN",
+          "endpoint": "POST /canciones",
+          "nota": "Pega el ID del álbum en 'albumId'.",
+          "body": {
+            "titulo": "Turbo Killer",
+            "genero": "TECHNO",
+            "imagenUrl": "https://placehold.co/400?text=Turbo",
+            "publica": true,
+            "albumId": "PEGAR_AQUI_ID_ALBUM",
+            "colaboradores": []
+          }
+        },
+        {
+          "accion": "6. CREAR PLAYLIST",
+          "endpoint": "POST /playlists",
+          "body": {
+            "nombre": "Code & Chill",
+            "descripcion": "Música para programar.",
+            "imagenUrl": "https://placehold.co/400/blue/white?text=Code",
+            "publica": true
+          }
+        },
+        {
+          "accion": "7. EDITAR PERFIL (Usuario)",
+          "endpoint": "PUT /usuarios/{id}",
+          "nota": "Tu UpdateUserRequest usa 'username' y 'foto' (diferente al register).",
+          "body": {
+            "username": "Neo_Synth_V2",
+            "foto": "https://placehold.co/400x400/orange/black?text=Updated"
+          }
+        }
+      ]
+    },
+
+    "PERFIL_2_LOLA": {
+      "rol": "Relleno (Pop)",
+      "pasos": [
+        {
+          "accion": "REGISTRO",
+          "body": {
+            "userName": "Lola_Pop",
+            "email": "lola@demo.com",
+            "password": "1234",
+            "imagenUrl": "https://placehold.co/400/pink/white?text=Lola"
+          }
+        },
+        {
+          "accion": "LOGIN",
+          "body": { "email": "lola@demo.com", "password": "1234" }
+        },
+        {
+          "accion": "CREAR ARTISTA",
+          "body": {
+            "nombre": "Lola Indigo Clone",
+            "biografia": "La reina del pop."
+          }
+        },
+        {
+          "accion": "CREAR ÁLBUM",
+          "body": {
+            "titulo": "La Niña",
+            "publico": true,
+            "imagenUrl": "https://placehold.co/500/purple/pink?text=Niña"
+          }
+        },
+        {
+          "accion": "CREAR CANCIÓN",
+          "body": {
+            "titulo": "Trendy",
+            "genero": "POP",
+            "imagenUrl": "https://placehold.co/400?text=Trendy",
+            "publica": true,
+            "albumId": "PEGAR_ID_ALBUM",
+            "colaboradores": []
+          }
+        }
+      ]
+    },
+
+    "PERFIL_3_ROCKER": {
+      "rol": "Relleno (Rock)",
+      "pasos": [
+        {
+          "accion": "REGISTRO",
+          "body": {
+            "userName": "Rocker_Man",
+            "email": "rock@demo.com",
+            "password": "1234",
+            "imagenUrl": "https://placehold.co/400/black/red?text=Rock"
+          }
+        },
+        {
+          "accion": "LOGIN",
+          "body": { "email": "rock@demo.com", "password": "1234" }
+        },
+        {
+          "accion": "CREAR ARTISTA",
+          "body": {
+            "nombre": "Los Truenos",
+            "biografia": "Rock Puro."
+          }
+        },
+        {
+          "accion": "CREAR ÁLBUM",
+          "body": {
+            "titulo": "Alto Voltaje",
+            "publico": true,
+            "imagenUrl": "https://placehold.co/500/red/black?text=Volt"
+          }
+        },
+        {
+          "accion": "CREAR CANCIÓN",
+          "body": {
+            "titulo": "Cuerdas Rotas",
+            "genero": "ROCK",
+            "imagenUrl": "https://placehold.co/400?text=Rock",
+            "publica": true,
+            "albumId": "PEGAR_ID_ALBUM",
+            "colaboradores": []
+          }
+        }
+      ]
+    },
+
+    "PERFIL_4_TRAP": {
+      "rol": "Relleno (Urbano)",
+      "pasos": [
+        {
+          "accion": "REGISTRO",
+          "body": {
+            "userName": "Trap_God",
+            "email": "trap@demo.com",
+            "password": "1234",
+            "imagenUrl": "https://placehold.co/400/gold/black?text=Trap"
+          }
+        },
+        {
+          "accion": "LOGIN",
+          "body": { "email": "trap@demo.com", "password": "1234" }
+        },
+        {
+          "accion": "CREAR ARTISTA",
+          "body": {
+            "nombre": "Young King",
+            "biografia": "100% Urbano."
+          }
+        },
+        {
+          "accion": "CREAR ÁLBUM",
+          "body": {
+            "titulo": "Callejeros",
+            "genero": "URBANO",
+            "publico": true,
+            "imagenUrl": "https://placehold.co/500/gray/white?text=Calle"
+          }
+        },
+        {
+          "accion": "CREAR CANCIÓN",
+          "body": {
+            "titulo": "En el Barrio",
+            "genero": "URBANO",
+            "imagenUrl": "https://placehold.co/400?text=Barrio",
+            "publica": true,
+            "albumId": "PEGAR_ID_ALBUM",
+            "colaboradores": []
+          }
+        }
+      ]
+    },
+
+    "PERFIL_5_LUNA": {
+      "rol": "Relleno (Indie)",
+      "pasos": [
+        {
+          "accion": "REGISTRO",
+          "body": {
+            "userName": "Luna_Indie",
+            "email": "luna@demo.com",
+            "password": "1234",
+            "imagenUrl": "https://placehold.co/400/teal/white?text=Luna"
+          }
+        },
+        {
+          "accion": "LOGIN",
+          "body": { "email": "luna@demo.com", "password": "1234" }
+        },
+        {
+          "accion": "CREAR ARTISTA",
+          "body": {
+            "nombre": "Luna Menguante",
+            "biografia": "Sad vibes."
+          }
+        },
+        {
+          "accion": "CREAR ÁLBUM",
+          "body": {
+            "titulo": "Melancolía",
+            "publico": true,
+            "imagenUrl": "https://placehold.co/500/blue/gray?text=Sad"
+          }
+        },
+        {
+          "accion": "CREAR CANCIÓN",
+          "body": {
+            "titulo": "Café Frío",
+            "genero": "INDIE",
+            "imagenUrl": "https://placehold.co/400?text=Cafe",
+            "publica": true,
+            "albumId": "PEGAR_ID_ALBUM",
+            "colaboradores": []
+          }
+        }
+      ]
+    },
+
+    "EXTRAS_PLAYLISTS": {
+      "nota": "Úsalas con cualquier usuario logueado",
+      "items": [
+        {
+          "tipo": "Gym (Pública)",
+          "body": {
+            "nombre": "Gym Motivation",
+            "descripcion": "A tope.",
+            "imagenUrl": "https://placehold.co/400/red/white?text=GYM",
+            "publica": true
+          }
+        },
+        {
+          "tipo": "Secreta (Privada)",
+          "body": {
+            "nombre": "Secret Songs",
+            "descripcion": "Shhh.",
+            "imagenUrl": "https://placehold.co/400/black/gray?text=Secret",
+            "publica": false
+          }
+        }
+      ]
+    },
+
+    "nota": "Estas peticiones NO llevan Body JSON. Solo tienes que poner la URL y el Token en el Header.",
+
+    "ACCIONES": [
+      {
+        "nombre": "1. AÑADIR CANCIÓN A PLAYLIST",
+        "metodo": "POST",
+        "url": "http://localhost:8080/playlists/{idPlaylist}/canciones/{idCancion}",
+        "ejemplo_real": "http://localhost:8080/playlists/1/canciones/5",
+        "descripcion": "Añade la canción 5 a la playlist 1."
+      },
+      {
+        "nombre": "2. SEGUIR A UN ARTISTA",
+        "metodo": "POST",
+        "url": "http://localhost:8080/usuarios/follow/{idArtista}",
+        "ejemplo_real": "http://localhost:8080/usuarios/follow/2",
+        "descripcion": "El usuario logueado empieza a seguir al artista con ID 2."
+      },
+      {
+        "nombre": "3. REGISTRAR ESCUCHA (Historial)",
+        "metodo": "POST",
+        "url": "http://localhost:8080/historial/escuchar/{idCancion}",
+        "ejemplo_real": "http://localhost:8080/historial/escuchar/5",
+        "descripcion": "Añade la canción 5 al historial del usuario y cuenta como reproducción."
+      },
+      {
+        "nombre": "4. ELIMINAR CANCIÓN DE PLAYLIST",
+        "metodo": "DELETE",
+        "url": "http://localhost:8080/playlists/{idPlaylist}/canciones/{idCancion}",
+        "ejemplo_real": "http://localhost:8080/playlists/1/canciones/5",
+        "descripcion": "Quita la canción 5 de la playlist 1."
+      },
+      {
+        "nombre": "5. DEJAR DE SEGUIR ARTISTA",
+        "metodo": "DELETE",
+        "url": "http://localhost:8080/usuarios/follow/{idArtista}",
+        "ejemplo_real": "http://localhost:8080/usuarios/follow/2",
+        "descripcion": "Deja de seguir al artista 2."
+      },
+      {
+        "nombre": "6. MOVER CANCIÓN A OTRO ÁLBUM (Re-vincular)",
+        "metodo": "PUT",
+        "url": "http://localhost:8080/canciones/{albumId}/vincular/{cancionId}",
+        "ejemplo_real": "http://localhost:8080/canciones/3/vincular/5",
+        "descripcion": "Mueve la canción 5 al álbum 3 (útil si te equivocaste al subirla)."
+      }
+    ]
+  }
+}

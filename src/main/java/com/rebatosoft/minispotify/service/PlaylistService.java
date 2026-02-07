@@ -2,6 +2,7 @@ package com.rebatosoft.minispotify.service;
 
 import com.rebatosoft.minispotify.dto.EntradaPlaylistDto;
 import com.rebatosoft.minispotify.dto.PlaylistDto;
+import com.rebatosoft.minispotify.dto.UsuarioDto;
 import com.rebatosoft.minispotify.dto.basicsDto.ArtistaBasicDto;
 import com.rebatosoft.minispotify.dto.basicsDto.CancionBasicDto;
 import com.rebatosoft.minispotify.dto.basicsDto.PlaylistBasicDto;
@@ -10,7 +11,6 @@ import com.rebatosoft.minispotify.entities.Usuario;
 import com.rebatosoft.minispotify.entities.componentes.Cancion;
 import com.rebatosoft.minispotify.entities.componentes.EntradaPlaylist;
 import com.rebatosoft.minispotify.entities.componentes.Playlist;
-import com.rebatosoft.minispotify.repositories.AlbumRepository;
 import com.rebatosoft.minispotify.repositories.CancionRepository;
 import com.rebatosoft.minispotify.repositories.PlaylistRepository;
 import com.rebatosoft.minispotify.repositories.TablasIntermedias.EntradaPlaylistRepository;
@@ -127,31 +127,21 @@ public class PlaylistService {
     }
 
 
+    // En PlaylistService.java
+
     @Transactional
-    public void eliminarCancionPlaylist(Long idCancion , Long idPlaylist){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
-        Playlist playlist = playlistRepository.findById(Integer.parseInt(String.valueOf(idPlaylist)))
+    public void eliminarCancionPlaylist(Long idCancion, Long idPlaylist) {
+
+        Playlist playlist = playlistRepository.findById(idPlaylist.intValue())
                 .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
 
-        if (!playlist.getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("No tienes permiso para eliminar canciones");
+        boolean eliminado = playlist.getCancionesEntradas().removeIf(entrada ->
+                entrada.getCancion().getId() == idCancion.longValue()
+        );
+
+        if (!eliminado) {
+            throw new RuntimeException("La canción no estaba en la playlist");
         }
-
-        Cancion cancion = cancionRepository.findById(idCancion)
-                .orElseThrow(() -> new RuntimeException("cancion no encontrada"));
-
-        if(cancion == null){
-            throw new RuntimeException("Cancion no encontrada");
-        }
-
-        EntradaPlaylist entrada = entradaPlaylistRepository.findByCancionAndPlaylist(cancion,playlist);
-
-        if(entrada == null){
-            throw new RuntimeException("entrada no encontrada");
-        }
-
-        playlist.getCancionesEntradas().remove(entrada);
         playlistRepository.save(playlist);
     }
 
@@ -169,8 +159,22 @@ public class PlaylistService {
         PlaylistDto dto = new PlaylistDto();
         dto.setId(playlist.getId().toString());
         dto.setNombre(playlist.getTitulo());
+        dto.setDescripcion(playlist.getDescripcion());
         dto.setImagenUrl(playlist.getFoto());
         dto.setPublica(playlist.getPublica());
+
+        if (playlist.getUsuario() != null) {
+            Usuario u = playlist.getUsuario();
+            Long artistId = (u.getDatosArtista() != null) ? u.getDatosArtista().getId() : null;
+
+            dto.setUsuario(new UsuarioDto(
+                    u.getId().toString(),
+                    u.getUsername(),
+                    u.getCorreo(),
+                    u.getFotoUrl(),
+                    artistId != null ? new ArtistaBasicDto(artistId.toString(), u.getDatosArtista().getNombre(), u.getDatosArtista().getFoto()) : null
+            ));
+        }
 
         if (playlist.getCancionesEntradas() != null) {
             List<EntradaPlaylistDto> entradas = playlist.getCancionesEntradas().stream()

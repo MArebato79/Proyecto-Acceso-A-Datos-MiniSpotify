@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import io.jsonwebtoken.ExpiredJwtException; // <--- IMPORTANTE
+import io.jsonwebtoken.ExpiredJwtException;
 
 import java.io.IOException;
 
@@ -47,13 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtService.extractUsername(jwt);
         } catch (ExpiredJwtException e) {
-            // SI EL TOKEN ESTÁ CADUCADO:
-            // No hacemos nada, simplemente dejamos que la petición siga SIN autenticación.
-            // Spring Security se encargará de devolver un 403 si la ruta lo requiere.
             filterChain.doFilter(request, response);
             return;
         } catch (Exception e) {
-            // CUALQUIER OTRO ERROR DE TOKEN:
             filterChain.doFilter(request, response);
             return;
         }

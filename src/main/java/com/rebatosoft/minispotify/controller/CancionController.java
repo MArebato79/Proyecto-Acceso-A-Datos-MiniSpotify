@@ -29,7 +29,6 @@ public class CancionController {
 
     @GetMapping("/generos")
     public ResponseEntity<List<String>> getGeneros() {
-        // Convierte los valores del Enum a una lista de Strings
         List<String> generos = Arrays.stream(GENEROS.values())
                 .map(Enum::name)
                 .toList();
@@ -40,6 +39,12 @@ public class CancionController {
     public ResponseEntity<CancionDto> crearCancion(@RequestBody @Valid CancionRequest cancion) {
         CancionDto cancionNueva =  cancionService.crearCancion(cancion);
         return new ResponseEntity<>(cancionNueva,HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{albumId}/vincular/{cancionId}")
+    public ResponseEntity<Void> vincularCancion(@PathVariable Long albumId, @PathVariable Long cancionId) {
+        cancionService.cambiarAlbum(cancionId, albumId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/estado")

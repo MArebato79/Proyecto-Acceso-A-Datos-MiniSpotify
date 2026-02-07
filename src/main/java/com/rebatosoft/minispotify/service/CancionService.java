@@ -155,6 +155,8 @@ public class CancionService {
             ArtistaDto artDto = new ArtistaDto();
             artDto.setId(cancion.getAutor().getId().toString());
             artDto.setNombre(cancion.getAutor().getNombre());
+            artDto.setBiografia(cancion.getAutor().getBiografia());
+            artDto.setImagenUrl(cancion.getAutor().getFoto());
             dto.setArtista(artDto);
         }
 

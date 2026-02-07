@@ -24,9 +24,9 @@ public class EntradaPlaylist {
 
     private int posicionCancion;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Playlist playlist;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Cancion cancion;
 }

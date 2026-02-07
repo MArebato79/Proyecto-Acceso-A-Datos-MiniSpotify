@@ -18,6 +18,5 @@ public class ArtistaDto {
     private String nombre;
     private String biografia;
     private String imagenUrl;
-    private List<PlaylistBasicDto> playlists;
     private List<AlbumBasicDto> albums;
 }

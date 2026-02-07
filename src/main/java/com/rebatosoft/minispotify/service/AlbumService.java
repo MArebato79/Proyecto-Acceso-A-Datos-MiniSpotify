@@ -197,17 +197,23 @@ public class AlbumService {
         AlbumDto dto = new AlbumDto();
         dto.setId(album.getId().toString());
         dto.setNombre(album.getNombre());
+        dto.setImagenUrl(album.getFoto());
 
         if (album.getArtista() != null) {
             ArtistaBasicDto artDto = new ArtistaBasicDto();
             artDto.setId(album.getArtista().getId().toString());
             artDto.setNombre(album.getArtista().getNombre());
+            artDto.setImagenUrl(album.getArtista().getFoto());
             dto.setArtista(artDto);
         }
 
         if (album.getCanciones() != null) {
             List<CancionBasicDto> canciones = album.getCanciones().stream()
-                    .map(c -> new CancionBasicDto(String.valueOf(c.getId()), c.getTitulo(), null))
+                    .map(c -> new CancionBasicDto(
+                            String.valueOf(c.getId()),
+                            c.getTitulo(),
+                            (c.getFoto() != null && !c.getFoto().isEmpty()) ? c.getFoto() : album.getFoto()
+                    ))
                     .collect(Collectors.toList());
             dto.setCanciones(canciones);
         }

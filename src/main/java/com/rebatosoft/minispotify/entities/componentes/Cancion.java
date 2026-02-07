@@ -28,7 +28,7 @@ public class Cancion {
 
     private boolean publica;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private Artista autor;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "cancion")
@@ -37,7 +37,7 @@ public class Cancion {
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "cancionEscuchada")
     private List<Historial> escuchasDeLaCancion;
 
-    @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Album album;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cancion", fetch = FetchType.LAZY)

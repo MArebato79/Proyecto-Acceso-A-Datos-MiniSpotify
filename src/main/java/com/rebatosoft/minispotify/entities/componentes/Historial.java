@@ -23,10 +23,10 @@ public class Historial {
 
     private LocalDateTime tiempoEscucha;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Usuario usuario;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Cancion cancionEscuchada;
 
 

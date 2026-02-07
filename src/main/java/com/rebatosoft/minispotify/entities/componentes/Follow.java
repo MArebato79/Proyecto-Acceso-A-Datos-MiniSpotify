@@ -23,9 +23,9 @@ public class Follow {
 
     private LocalDate fecha;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch =  FetchType.EAGER)
     private Usuario usuarioSeguidor;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Artista artistaSeguido;
 }

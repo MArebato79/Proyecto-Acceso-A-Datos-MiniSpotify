@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/artistas")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ArtistaController {
 
     private final ArtistaService artistaService;

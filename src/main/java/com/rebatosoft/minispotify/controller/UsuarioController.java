@@ -34,15 +34,13 @@ public class UsuarioController {
     }
 
     // 2. SEGUIR ARTISTA
-    // URL: POST /usuarios/follow/5
     @PostMapping("/follow/{artistId}")
     public ResponseEntity<Void> followArtist(@PathVariable Long artistId) {
         usuarioService.followArtist(artistId);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
     // 3. DEJAR DE SEGUIR ARTISTA
-    // URL: DELETE /usuarios/follow/5
     @DeleteMapping("/follow/{artistId}")
     public ResponseEntity<Void> unfollowArtist(@PathVariable Long artistId) {
         usuarioService.unfollowArtist(artistId);

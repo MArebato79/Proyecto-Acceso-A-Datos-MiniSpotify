@@ -1,7 +1,7 @@
 package com.rebatosoft.minispotify.controller;
 
 import com.rebatosoft.minispotify.dto.requests.LoginRequest;
-import com.rebatosoft.minispotify.dto.requests.RegisterRequest; // Si quieres mover el registro aquí
+import com.rebatosoft.minispotify.dto.requests.RegisterRequest;
 import com.rebatosoft.minispotify.entities.Usuario;
 import com.rebatosoft.minispotify.repositories.UsuarioRepository;
 import com.rebatosoft.minispotify.security.JwtService;
@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder; // <--- NECESARIO
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,31 +24,71 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
+    // ===================== LOGIN =====================
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
+        // 1. Autenticar credenciales
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
-        Usuario usuario = usuarioRepository.findByCorreo(request.email()).orElseThrow();
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
+        // 2. Buscar usuario en BD
+        Usuario usuario = usuarioRepository.findByCorreo(request.email())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // 3. Generar Token
+        // Nota: Asumimos que tu JwtService tiene un método generateToken que acepta (UserDetails, Map extra)
+        // O simplemente (UserDetails). Ajusta según tu JwtService.
         Long artistId = (usuario.getDatosArtista() != null) ? usuario.getDatosArtista().getId() : null;
-        String token = jwtService.generateToken(userDetails, artistId);
 
-        // CREAMOS UNA RESPUESTA COMPLETA
+        String token = jwtService.generateToken(usuario, artistId);
+
+        // 4. Construir respuesta manual (Map)
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
+        response.put("id", usuario.getId());
+        response.put("username", usuario.getUsername());
+        response.put("email", usuario.getCorreo());
+        response.put("foto", usuario.getFotoUrl());
+        response.put("imagenUrl", usuario.getFotoUrl()); // Por compatibilidad con frontend
+        response.put("artistId", artistId);
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("id", usuario.getId());
-        userData.put("username", usuario.getUsername());
-        userData.put("email", usuario.getCorreo());
-        userData.put("artistId", artistId);
+        return ResponseEntity.ok(response);
+    }
 
-        response.put("user", userData);
+    // ===================== REGISTRO =====================
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest request) {
+        // 1. Comprobar si ya existe (Opcional pero recomendado)
+        if (usuarioRepository.findByCorreo(request.email()).isPresent()) {
+            throw new RuntimeException("El correo ya está registrado");
+        }
+
+        // 2. Crear nuevo usuario
+        Usuario usuario = new Usuario();
+        usuario.setUsername(request.userName()); // O request.nombre() según tu DTO
+        usuario.setCorreo(request.email());
+        usuario.setContrasena(passwordEncoder.encode(request.password())); // Encriptar pass
+
+        // Asignar rol si tu sistema lo requiere (ej: usuario.setRole(Role.USER))
+
+        // 3. Guardar en BD
+        Usuario guardado = usuarioRepository.save(usuario);
+
+        // 4. Generar Token para que haga login directo
+        String token = jwtService.generateToken(guardado, null);
+
+        // 5. Construir respuesta igual que en Login
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("id", guardado.getId());
+        response.put("username", guardado.getUsername());
+        response.put("email", guardado.getCorreo());
+        response.put("foto", guardado.getFotoUrl());
+        response.put("imagenUrl", guardado.getFotoUrl());
+        response.put("artistId", null);
 
         return ResponseEntity.ok(response);
     }

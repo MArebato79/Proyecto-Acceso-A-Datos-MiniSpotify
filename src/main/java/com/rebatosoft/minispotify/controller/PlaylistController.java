@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/playlists")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class PlaylistController {
 
     final PlaylistService playlistService;
@@ -52,11 +51,6 @@ public class PlaylistController {
     public ResponseEntity<Void> removerCancionDePlaylist(@PathVariable Long playlistId, @PathVariable Long cancionId) {
         playlistService.eliminarCancionPlaylist(cancionId, playlistId);
         return ResponseEntity.noContent().build();
-    }
-    @PutMapping("/{albumId}/canciones/vincular/{cancionId}")
-    public ResponseEntity<Void> vincularCancion(@PathVariable Long albumId, @PathVariable Long cancionId) {
-        cancionService.cambiarAlbum(cancionId, albumId);
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping

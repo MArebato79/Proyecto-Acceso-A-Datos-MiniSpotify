@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/canciones/**", "/albumes/**", "/artistas/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/canciones/**").hasRole("ARTISTA")
                         .requestMatchers(HttpMethod.PUT, "/canciones/**").hasRole("ARTISTA")
+                        .requestMatchers("/usuarios/follow/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/canciones/**").hasRole("ARTISTA")
 
                         .requestMatchers(HttpMethod.POST, "/albumes/**").hasRole("ARTISTA")
@@ -52,12 +53,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 👇 2. DEFINIR LA CONFIGURACIÓN DE CORS (QUÉ ESTÁ PERMITIDO)
+    // 2. DEFINIR LA CONFIGURACIÓN DE CORS (QUÉ ESTÁ PERMITIDO)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Permite el puerto de tu Frontend (React suele ser 5173, comprueba si es el tuyo)
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
