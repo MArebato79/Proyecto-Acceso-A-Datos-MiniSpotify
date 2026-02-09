@@ -150,6 +150,7 @@ public class CancionService {
         dto.setTitulo(cancion.getTitulo());
         dto.setGenero(cancion.getGenero() != null ? cancion.getGenero().toString() : null);
         dto.setPublica(cancion.isPublica()?"Publica":"Privada");
+        dto.setImagenUrl(cancion.getFoto());
 
         if (cancion.getAutor() != null) {
             ArtistaDto artDto = new ArtistaDto();
@@ -164,6 +165,7 @@ public class CancionService {
             AlbumBasicDto albumBasic = new AlbumBasicDto();
             albumBasic.setId(cancion.getAlbum().getId().toString());
             albumBasic.setNombre(cancion.getAlbum().getNombre());
+            albumBasic.setImagenUrl(cancion.getAlbum().getFoto());
             dto.setAlbum(albumBasic);
         }
         return dto;

@@ -41,12 +41,13 @@ public class AlbumService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es artista");
         }
 
-        Optional<Artista> artista = artistaRepository.findById(usuario.getDatosArtista().getId());
-
+        // --- CAMBIO: No hace falta buscar el artista otra vez, ya lo tenemos en 'usuario'
         Album album = new Album();
         album.setNombre(albumRequest.titulo());
-        album.setArtista(artista.get());
         album.setFoto(albumRequest.imagenUrl());
+        album.setPublico(albumRequest.publico()); // Asignamos si es público o no
+        album.setFechaLanzamiento(LocalDate.now()); // Ponemos fecha de hoy
+        album.setArtista(usuario.getDatosArtista()); // Asignamos el artista dueño
 
         return convertirADto(repository.save(album));
     }
@@ -55,33 +56,35 @@ public class AlbumService {
         Album album = repository.findById(id.intValue())
                 .orElseThrow(() -> new RuntimeException("Álbum no encontrado con ID: " + id));
 
+        // Actualizamos datos básicos
         album.setNombre(request.titulo());
-        album.setFechaLanzamiento(LocalDate.now());
+        // Opcional: album.setFechaLanzamiento(LocalDate.now());
 
         if (request.imagenUrl() != null && !request.imagenUrl().isEmpty()) {
             album.setFoto(request.imagenUrl());
         }
-        album.setPublico(request.publico() != null ? request.publico() : album.getPublico());
+        // Si nos envían el dato de público, lo actualizamos
+        if (request.publico() != null) {
+            album.setPublico(request.publico());
+        }
 
         Album actualizado = repository.save(album);
 
+        // --- CAMBIO: Construimos el DTO manualmente o reutilizamos métodos para no duplicar lógica
+        // Aquí simplificamos la creación del ArtistaBasicDto
         Artista artistaEntity = actualizado.getArtista();
         ArtistaBasicDto artistaBasic = new ArtistaBasicDto(
                 String.valueOf(artistaEntity.getId()),
                 artistaEntity.getNombre(),
                 artistaEntity.getFoto()
         );
+
         List<CancionBasicDto> cancionesDto = new ArrayList<>();
 
         if (actualizado.getCanciones() != null) {
+            // --- CAMBIO: Usamos el método auxiliar 'convertirCancionADto' para unificar la lógica
             cancionesDto = actualizado.getCanciones().stream()
-                    .map(cancion -> new CancionBasicDto(
-                            String.valueOf(cancion.getId()),
-                            cancion.getTitulo(),
-                            (cancion.getFoto() != null && !cancion.getFoto().isEmpty())
-                                    ? cancion.getFoto()
-                                    : actualizado.getFoto()
-                    ))
+                    .map(cancion -> convertirCancionADto(cancion, actualizado))
                     .collect(Collectors.toList());
         }
 
@@ -92,7 +95,6 @@ public class AlbumService {
                 artistaBasic,
                 cancionesDto
         );
-
     }
 
     @Transactional
@@ -114,19 +116,21 @@ public class AlbumService {
         Cancion cancion = cancionRepository.findById(idCancion)
                 .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
+        // Vinculamos
         cancion.setAlbum(album);
         cancionRepository.save(cancion);
 
+        // Actualizamos la lista en memoria del álbum para el retorno
         if (!album.getCanciones().contains(cancion)) {
             album.getCanciones().add(cancion);
         }
 
+        // Guardamos el álbum para asegurar consistencia JPA
+        repository.save(album);
+
+        // --- CAMBIO: Usamos el método auxiliar para devolver la lista con TODOS los datos (duración, colaboradores, etc)
         return album.getCanciones().stream()
-                .map(c -> new CancionBasicDto(
-                        String.valueOf(c.getId()),
-                        c.getTitulo(),
-                        c.getFoto()
-                ))
+                .map(c -> convertirCancionADto(c, album))
                 .collect(Collectors.toList());
     }
 
@@ -153,34 +157,31 @@ public class AlbumService {
             throw new RuntimeException("Esta canción no pertenece al álbum indicado");
         }
 
+        // Desvinculamos
         cancion.setAlbum(null);
         cancionRepository.save(cancion);
 
         album.getCanciones().remove(cancion);
+        repository.save(album);
 
+        // --- CAMBIO: Usamos el método auxiliar
         return album.getCanciones().stream()
-                .map(c -> new CancionBasicDto(
-                        String.valueOf(c.getId()),
-                        c.getTitulo(),
-                        c.getFoto()
-                ))
+                .map(c -> convertirCancionADto(c, album))
                 .collect(Collectors.toList());
     }
 
-  public List<AlbumDto> getAlbumsByArtista() {
-      String email = SecurityContextHolder.getContext().getAuthentication().getName();
-      Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
+    public List<AlbumDto> getAlbumsByArtista() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByCorreo(email).orElseThrow();
 
-      if (usuario.getDatosArtista() == null) {
-          throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres artista");
-      }
+        if (usuario.getDatosArtista() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres artista");
+        }
 
-      List<AlbumDto> albums = repository.findAllByArtistaId(usuario.getDatosArtista().getId()).stream()
-              .map(this::convertirADto)
-              .collect(Collectors.toList());
-
-      return albums;
-   }
+        return repository.findAllByArtistaId(usuario.getDatosArtista().getId()).stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
 
     public List<AlbumDto> getAllAlbums() {
         return repository.findAll().stream()
@@ -189,10 +190,11 @@ public class AlbumService {
     }
 
     public AlbumDto getAlbumById(Long id) {
-        AlbumDto albumDto = convertirADto(repository.findById(id.intValue()).orElseThrow(null));
-        return albumDto;
+        return convertirADto(repository.findById(id.intValue())
+                .orElseThrow(() -> new RuntimeException("Álbum no encontrado")));
     }
 
+    // --- MÉTODO PRIVADO: Convierte un Álbum completo a DTO ---
     private AlbumDto convertirADto(Album album) {
         AlbumDto dto = new AlbumDto();
         dto.setId(album.getId().toString());
@@ -208,24 +210,53 @@ public class AlbumService {
         }
 
         if (album.getCanciones() != null) {
+            // --- CAMBIO: Usamos el helper para mapear cada canción de la lista
             List<CancionBasicDto> canciones = album.getCanciones().stream()
-                    .map(c -> new CancionBasicDto(
-                            String.valueOf(c.getId()),
-                            c.getTitulo(),
-                            (c.getFoto() != null && !c.getFoto().isEmpty()) ? c.getFoto() : album.getFoto()
-                    ))
+                    .map(c -> convertirCancionADto(c, album))
                     .collect(Collectors.toList());
             dto.setCanciones(canciones);
         }
         return dto;
     }
 
+    // --- NUEVO MÉTODO AUXILIAR: Mapea una Canción a DTO rellenando los huecos ---
+    // Este método centraliza la lógica para que 'duracion', 'genero', y 'colaboradores'
+    // se calculen siempre igual, evitando errores en el frontend.
+    private CancionBasicDto convertirCancionADto(Cancion cancion, Album album) {
 
-    private Album convertirAEntidad(AlbumRequest request, Artista artista) {
-        Album album = new Album();
-        album.setNombre(request.titulo());
-        album.setArtista(artista);
-        album.setFoto(request.imagenUrl());
-        return album;
+        // 1. Imagen: Si la canción no tiene, usamos la del álbum (Fallback)
+        String imagen = (cancion.getFoto() != null && !cancion.getFoto().isEmpty())
+                ? cancion.getFoto()
+                : album.getFoto();
+
+        // 2. Género: Control de nulos
+        String genero = cancion.getGenero() != null ? cancion.getGenero().name() : "POP";
+
+        // 3. Autor: Control de nulos
+        String autor = cancion.getAutor() != null ? cancion.getAutor().getNombre() : "Desconocido";
+
+        // 4. Colaboradores: Convertimos la lista de entidades a DTOs básicos
+        List<ArtistaBasicDto> colaboradores = new ArrayList<>();
+        if (cancion.getColaboraciones() != null) {
+            colaboradores = cancion.getColaboraciones().stream()
+                    .map(colab -> new ArtistaBasicDto(
+                            String.valueOf(colab.getArtistaColaborador().getId()),
+                            colab.getArtistaColaborador().getNombre(),
+                            colab.getArtistaColaborador().getFoto()
+                    ))
+                    .collect(Collectors.toList());
+        }
+
+        // 5. Retorno: Aquí ponemos '0' en duración porque no existe en la BD.
+        // El frontend recibirá 0 y pintará "--:--".
+        return new CancionBasicDto(
+                String.valueOf(cancion.getId()),
+                cancion.getTitulo(),
+                imagen,
+                genero,
+                0, // <--- Duración 'dummy'
+                autor,
+                colaboradores
+        );
     }
 }

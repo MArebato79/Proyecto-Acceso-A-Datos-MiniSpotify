@@ -61,6 +61,11 @@ public class PlaylistController {
         return ResponseEntity.ok(playlists);
     }
 
+    @GetMapping("/publicas")
+    public ResponseEntity<List<PlaylistDto>> getAllPublicPlaylists() {
+        return ResponseEntity.ok(playlistService.getAllPublicPlaylists());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PlaylistDto> obtenerPlaylist(@PathVariable Long id) {
         return ResponseEntity.ok(playlistService.getPlaylistById(id));

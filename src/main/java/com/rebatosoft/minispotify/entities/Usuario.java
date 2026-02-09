@@ -43,7 +43,7 @@ public class Usuario implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "usuarioSeguidor",fetch = FetchType.LAZY)
     private List<Follow> follows;
 
-    @OneToOne(mappedBy = "usuarioPropietario", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "usuarioPropietario",fetch =  FetchType.EAGER)
     private Artista datosArtista;
 
     @Override
@@ -55,7 +55,10 @@ public class Usuario implements UserDetails {
                     new SimpleGrantedAuthority("ROLE_USER")
             );
         }
-        // Si no, solo es un usuario normal
+        else {
+            System.out.println("❌ DEBUG LOGIN: El usuario " + this.correo + " NO tiene datos de artista asociados. datosArtista es NULL.");
+        }
+
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
@@ -87,5 +90,10 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getRealUsername() {
+        return username;
+    }
+
 
 }

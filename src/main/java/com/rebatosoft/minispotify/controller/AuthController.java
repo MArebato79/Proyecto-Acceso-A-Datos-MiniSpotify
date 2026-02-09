@@ -39,8 +39,7 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // 3. Generar Token
-        // Nota: Asumimos que tu JwtService tiene un método generateToken que acepta (UserDetails, Map extra)
-        // O simplemente (UserDetails). Ajusta según tu JwtService.
+
         Long artistId = (usuario.getDatosArtista() != null) ? usuario.getDatosArtista().getId() : null;
 
         String token = jwtService.generateToken(usuario, artistId);
@@ -49,7 +48,7 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         response.put("id", usuario.getId());
-        response.put("username", usuario.getUsername());
+        response.put("username", usuario.getRealUsername());
         response.put("email", usuario.getCorreo());
         response.put("foto", usuario.getFotoUrl());
         response.put("imagenUrl", usuario.getFotoUrl()); // Por compatibilidad con frontend
@@ -68,11 +67,11 @@ public class AuthController {
 
         // 2. Crear nuevo usuario
         Usuario usuario = new Usuario();
-        usuario.setUsername(request.userName()); // O request.nombre() según tu DTO
+        usuario.setUsername(request.userName());
         usuario.setCorreo(request.email());
         usuario.setContrasena(passwordEncoder.encode(request.password())); // Encriptar pass
 
-        // Asignar rol si tu sistema lo requiere (ej: usuario.setRole(Role.USER))
+        // Asignar rol si tu sistema lo requiere
 
         // 3. Guardar en BD
         Usuario guardado = usuarioRepository.save(usuario);

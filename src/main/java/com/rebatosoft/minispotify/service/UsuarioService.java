@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,7 @@ public class UsuarioService {
         Follow follow = new Follow();
         follow.setUsuarioSeguidor(usuario);
         follow.setArtistaSeguido(artista);
+        follow.setFecha(LocalDate.now());
 
         followRepository.save(follow);
     }
@@ -134,7 +136,7 @@ public class UsuarioService {
     private UsuarioDto convertirADto(Usuario usuario) {
         UsuarioDto dto = new UsuarioDto();
         dto.setId(usuario.getId().toString());
-        dto.setUsername(usuario.getUsername());
+        dto.setUsername(usuario.getRealUsername());
         dto.setEmail(usuario.getCorreo());
         dto.setAvatarUrl(usuario.getFotoUrl());
 

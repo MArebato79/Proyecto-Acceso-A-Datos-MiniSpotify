@@ -17,6 +17,7 @@ public class PlaylistDto {
     private boolean publica;
     private String descripcion;
     private String imagenUrl;
+    private String creador;
     private UsuarioDto usuario;
     private List<EntradaPlaylistDto> cancionesEntradas;
 }

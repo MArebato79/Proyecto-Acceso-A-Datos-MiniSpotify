@@ -8,7 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
     Page<Playlist> findByUsuario(Usuario usuario, Pageable pageable);
+    List<Playlist> findByPublicaTrue();
 }

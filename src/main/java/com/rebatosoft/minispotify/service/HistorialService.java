@@ -65,7 +65,7 @@ public class HistorialService {
         if (h.getCancionEscuchada() != null) {
             CancionBasicDto cBasic = new CancionBasicDto();
             cBasic.setId(String.valueOf(h.getCancionEscuchada().getId()));
-            cBasic.setNombre(h.getCancionEscuchada().getTitulo());
+            cBasic.setTitulo(h.getCancionEscuchada().getTitulo());
             dto.setCancion(cBasic);
         }
         return dto;

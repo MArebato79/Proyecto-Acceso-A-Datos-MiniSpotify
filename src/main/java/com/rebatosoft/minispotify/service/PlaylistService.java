@@ -20,11 +20,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,6 +125,14 @@ public class PlaylistService {
         return playlistDto;
     }
 
+    public List<PlaylistDto> getAllPublicPlaylists() {
+        List<Playlist> playlists = playlistRepository.findByPublicaTrue();
+
+        return playlists.stream()
+                .map(this::convertirADto) // Reutilizamos tu método convertirADto
+                .collect(Collectors.toList());
+    }
+
 
     // En PlaylistService.java
 
@@ -157,49 +164,61 @@ public class PlaylistService {
 
     private PlaylistDto convertirADto(Playlist playlist) {
         PlaylistDto dto = new PlaylistDto();
-        dto.setId(playlist.getId().toString());
+        dto.setId(String.valueOf(playlist.getId()));
         dto.setNombre(playlist.getTitulo());
-        dto.setDescripcion(playlist.getDescripcion());
         dto.setImagenUrl(playlist.getFoto());
         dto.setPublica(playlist.getPublica());
 
+        String nombreCreador = "Desconocido";
         if (playlist.getUsuario() != null) {
-            Usuario u = playlist.getUsuario();
-            Long artistId = (u.getDatosArtista() != null) ? u.getDatosArtista().getId() : null;
-
-            dto.setUsuario(new UsuarioDto(
-                    u.getId().toString(),
-                    u.getUsername(),
-                    u.getCorreo(),
-                    u.getFotoUrl(),
-                    artistId != null ? new ArtistaBasicDto(artistId.toString(), u.getDatosArtista().getNombre(), u.getDatosArtista().getFoto()) : null
-            ));
+            if (playlist.getUsuario().getRealUsername() != null && !playlist.getUsuario().getRealUsername().isEmpty()) {
+                nombreCreador = playlist.getUsuario().getRealUsername();
+            } else {
+                nombreCreador = playlist.getUsuario().getCorreo();
+            }
         }
+        dto.setCreador(nombreCreador);
 
+        List<EntradaPlaylistDto> entradasDto = new ArrayList<>();
         if (playlist.getCancionesEntradas() != null) {
-            List<EntradaPlaylistDto> entradas = playlist.getCancionesEntradas().stream()
-                    .map(entrada -> {
-                        EntradaPlaylistDto entDto = new EntradaPlaylistDto();
-                        entDto.setPosicion(entrada.getPosicionCancion());
-                        entDto.setFechaAgregado(entrada.getFechaIntroduccion().toString());
+            entradasDto = playlist.getCancionesEntradas().stream().map(entrada -> {
+                EntradaPlaylistDto entradaDto = new EntradaPlaylistDto();
+                entradaDto.setId(String.valueOf(entrada.getId()));
+                entradaDto.setFechaAgregado(String.valueOf(entrada.getFechaIntroduccion()));
 
-                        if (entrada.getCancion() != null) {
-                            CancionBasicDto cBasic = new CancionBasicDto();
-                            cBasic.setId(String.valueOf(entrada.getCancion().getId()));
-                            cBasic.setNombre(entrada.getCancion().getTitulo());
-                            entDto.setCancion(cBasic);
+                Cancion c = entrada.getCancion();
+                if (c != null) {
+                    // Fallback imagen
+                    String img = c.getFoto();
+                    if ((img == null || img.isEmpty()) && c.getAlbum() != null) {
+                        img = c.getAlbum().getFoto();
+                    }
 
-                            if (entrada.getCancion().getAutor() != null) {
-                                ArtistaBasicDto aBasic = new ArtistaBasicDto();
-                                aBasic.setId(entrada.getCancion().getAutor().getId().toString());
-                                aBasic.setNombre(entrada.getCancion().getAutor().getNombre());
-                                entDto.setArtista(aBasic);
-                            }
-                        }
-                        return entDto;
-                    }).collect(Collectors.toList());
-            dto.setCancionesEntradas(entradas);
+                    // Colaboradores
+                    List<ArtistaBasicDto> colabs = new ArrayList<>();
+                    if (c.getColaboraciones() != null) {
+                        colabs = c.getColaboraciones().stream().map(col -> new ArtistaBasicDto(
+                                String.valueOf(col.getArtistaColaborador().getId()),
+                                col.getArtistaColaborador().getNombre(),
+                                col.getArtistaColaborador().getFoto()
+                        )).collect(Collectors.toList());
+                    }
+
+                    CancionBasicDto cancionBasic = new CancionBasicDto();
+                    cancionBasic.setId(String.valueOf(c.getId()));
+                    cancionBasic.setTitulo(c.getTitulo());
+                    cancionBasic.setImagenUrl(img);
+                    cancionBasic.setGenero(c.getGenero() != null ? c.getGenero().name() : "POP");
+                    cancionBasic.setDuracion(0);
+                    cancionBasic.setArtistaNombre(c.getAutor() != null ? c.getAutor().getNombre() : "Desconocido");
+                    cancionBasic.setColaboradores(colabs);
+
+                    entradaDto.setCancion(cancionBasic);
+                }
+                return entradaDto;
+            }).collect(Collectors.toList());
         }
+        dto.setCancionesEntradas(entradasDto);
         return dto;
     }
 }

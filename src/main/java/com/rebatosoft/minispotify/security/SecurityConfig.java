@@ -34,15 +34,15 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/usuarios/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/canciones/**", "/albumes/**", "/artistas/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/canciones/**", "/albums/**", "/artistas/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/canciones/**").hasRole("ARTISTA")
                         .requestMatchers(HttpMethod.PUT, "/canciones/**").hasRole("ARTISTA")
                         .requestMatchers("/usuarios/follow/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/canciones/**").hasRole("ARTISTA")
 
-                        .requestMatchers(HttpMethod.POST, "/albumes/**").hasRole("ARTISTA")
-                        .requestMatchers(HttpMethod.PUT, "/albumes/**").hasRole("ARTISTA")
-                        .requestMatchers(HttpMethod.DELETE, "/albumes/**").hasRole("ARTISTA")
+                        .requestMatchers(HttpMethod.POST, "/albums/**").hasRole("ARTISTA")
+                        .requestMatchers(HttpMethod.PUT, "/albums/**").hasRole("ARTISTA")
+                        .requestMatchers(HttpMethod.DELETE, "/albums/**").hasRole("ARTISTA")
 
                         .anyRequest().authenticated()
                 )

@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EntradaPlaylistDto {
+    private String id;
     private Integer posicion;
     private CancionBasicDto cancion;
     private ArtistaBasicDto artista;
