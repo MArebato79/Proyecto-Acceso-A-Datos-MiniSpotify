@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,6 +19,6 @@ public class CancionDto {
     private String publica;
     private String genero;
     private ArtistaDto artista;
-    private String colaboraciones;
+    private List<ColaboracionDto> colaboraciones;
     private AlbumBasicDto album;
 }

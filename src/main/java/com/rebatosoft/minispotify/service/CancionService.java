@@ -149,9 +149,10 @@ public class CancionService {
         dto.setId((long) cancion.getId());
         dto.setTitulo(cancion.getTitulo());
         dto.setGenero(cancion.getGenero() != null ? cancion.getGenero().toString() : null);
-        dto.setPublica(cancion.isPublica()?"Publica":"Privada");
+        dto.setPublica(cancion.isPublica() ? "Publica" : "Privada");
         dto.setImagenUrl(cancion.getFoto());
 
+        // 1. Mapear el Artista Principal
         if (cancion.getAutor() != null) {
             ArtistaDto artDto = new ArtistaDto();
             artDto.setId(cancion.getAutor().getId().toString());
@@ -161,6 +162,7 @@ public class CancionService {
             dto.setArtista(artDto);
         }
 
+        // 2. Mapear el Álbum
         if (cancion.getAlbum() != null) {
             AlbumBasicDto albumBasic = new AlbumBasicDto();
             albumBasic.setId(cancion.getAlbum().getId().toString());
@@ -168,6 +170,15 @@ public class CancionService {
             albumBasic.setImagenUrl(cancion.getAlbum().getFoto());
             dto.setAlbum(albumBasic);
         }
+
+        // 3. Mapear las Colaboraciones (ESTO ES LO NUEVO)
+        if (cancion.getColaboraciones() != null && !cancion.getColaboraciones().isEmpty()) {
+            List<ColaboracionDto> colabsDto = cancion.getColaboraciones().stream()
+                    .map(this::convertirAColaboracionDto)
+                    .collect(Collectors.toList());
+            dto.setColaboraciones(colabsDto);
+        }
+
         return dto;
     }
 

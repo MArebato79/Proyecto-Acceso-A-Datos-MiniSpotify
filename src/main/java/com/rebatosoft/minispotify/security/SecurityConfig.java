@@ -34,6 +34,13 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/usuarios/register").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api-docs/**"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/canciones/**", "/albums/**", "/artistas/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/canciones/**").hasRole("ARTISTA")
                         .requestMatchers(HttpMethod.PUT, "/canciones/**").hasRole("ARTISTA")
